@@ -1,48 +1,19 @@
-import type { CommitType } from './config.js';
-
-const commitTypeFormats: Record<CommitType, string> = {
-	'': '<commit message>',
-	conventional: '<type>(<optional scope>): <commit message>',
-};
-const specifyCommitFormat = (type: CommitType) => `The output response must be in format:\n${commitTypeFormats[type]}`;
-
-const commitTypes: Record<CommitType, string> = {
-	'': '',
-
-	/**
-	 * References:
-	 * Commitlint:
-	 * https://github.com/conventional-changelog/commitlint/blob/18fbed7ea86ac0ec9d5449b4979b762ec4305a92/%40commitlint/config-conventional/index.js#L40-L100
-	 *
-	 * Conventional Changelog:
-	 * https://github.com/conventional-changelog/conventional-changelog/blob/d0e5d5926c8addba74bc962553dd8bcfba90e228/packages/conventional-changelog-conventionalcommits/writer-opts.js#L182-L193
-	 */
-	conventional: `Choose a type from the type-to-description JSON below that best describes the git diff:\n${
-		JSON.stringify({
-			docs: 'Documentation only changes',
-			style: 'Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)',
-			refactor: 'A code change that neither fixes a bug nor adds a feature',
-			perf: 'A code change that improves performance',
-			test: 'Adding missing tests or correcting existing tests',
-			build: 'Changes that affect the build system or external dependencies',
-			ci: 'Changes to our CI configuration files and scripts',
-			chore: "Other changes that don't modify src or test files",
-			revert: 'Reverts a previous commit',
-			feat: 'A new feature',
-			fix: 'A bug fix',
-		}, null, 2)
-	}`,
-};
-
-export const generatePrompt = (
-	locale: string,
-	maxLength: number,
-	type: CommitType,
-) => [
-	'Generate a concise git commit message written in present tense for the following code diff with the given specifications below:',
-	`Message language: ${locale}`,
-	`Commit message must be a maximum of ${maxLength} characters.`,
-	'Exclude anything unnecessary such as translation. Your entire response will be passed directly into git commit.',
-	commitTypes[type],
-	specifyCommitFormat(type),
-].filter(Boolean).join('\n');
+export const generatePrompt = (maxLength: number) =>
+	[
+		"Generate a concise git commit message written in present tense for the following code diff with the given specifications below, aiming for the best result you can think of:",
+		"* It must always be written in English.",
+		`* Commit message must be a maximum of ${maxLength} characters.`,
+		"* Please do not use words like 'Refactor' or 'Update'.",
+		"* Exclude anything unnecessary such as translation. Your entire response will be passed directly into git commit.",
+		"* Please do not output code blocks such as '```'.",
+		"* Please follow the Conventional Commits format for commit messages.",
+		"  * When bumping a module, please set scope: `build(deps)`.",
+		"  * It's unnecessary to include 'in ...' in the commit message. Instead, please include it in the scope of Conventional Commits.",
+		"    * For example, `feat: add ... in Dockerfile` should be `feat(Dockerfile): add ...`.",
+		"    * For example, `fix(utils): fix typo in foobar.ts` should be `fix(utils/foobar): fix typo`.",
+		"  * Please do not include file extensions in the scope.",
+		"    * For example, use `feat(index): add ...` instead of `feat(index.ts): add ...`.",
+		"Please generate the best commit message that has the above features and that you wouldn't be embarrassed to show to anyone. Thank you in advance.",
+	]
+		.filter(Boolean)
+		.join("\n");
