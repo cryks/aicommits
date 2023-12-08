@@ -17,3 +17,24 @@ export const generatePrompt = (maxLength: number) =>
 	]
 		.filter(Boolean)
 		.join("\n");
+
+export const generatePromptForBody = (maxLength: number) =>
+	[
+		"Next, please generate the body that will be the Conventional Commits Body.",
+		"This Body Message does not have the restrictions mentioned earlier.",
+		"However, please adhere to the following conditions.",
+		"* It must always be written in English.",
+		"* Please insert appropriate line breaks. About three lines is desirable.",
+		`* The maximum number of characters per line is ${maxLength}.`,
+		"* After inserting appropriate line breaks and after the Body Message, please write a brief summary in one line starting with the string `[SUMMARY]`, in *Japanese*.",
+		"Example:",
+		"  fix: prevent racing of requests",
+		"  ",
+		"  Introduce a request id and a reference to latest request. Dismiss",
+		"  incoming responses other than from latest request.",
+		"  ",
+		"  Remove timeouts which were used to mitigate the racing issue but are",
+		"  obsolete now.",
+	]
+		.filter(Boolean)
+		.join("\n");

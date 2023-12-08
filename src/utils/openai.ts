@@ -12,7 +12,7 @@ import {
 import createHttpsProxyAgent from "https-proxy-agent";
 import { KnownError } from "./error.js";
 import type { CommitType } from "./config.js";
-import { generatePrompt } from "./prompt.js";
+import { generatePrompt, generatePromptForBody } from "./prompt.js";
 
 const httpsPost = async (
 	hostname: string,
@@ -188,27 +188,7 @@ export const generateCommitMessage = async (
 		if (requestBody) {
 			messages.push({
 				role: "system",
-				content: (
-					[
-						"Next, please generate the body that will be the Conventional Commits Body.",
-						"This Body Message does not have the restrictions mentioned earlier.",
-						"However, please adhere to the following conditions.",
-						"* It must always be written in English.",
-						"* Please insert appropriate line breaks. About three lines is desirable.",
-						`* The maximum number of characters per line is ${maxLength}.`,
-						"* After inserting appropriate line breaks and after the Body Message, please write a brief summary in one line starting with the string `[SUMMARY]`, in *Japanese*.",
-						"Example:",
-						"  fix: prevent racing of requests",
-						"  ",
-						"  Introduce a request id and a reference to latest request. Dismiss",
-						"  incoming responses other than from latest request.",
-						"  ",
-						"  Remove timeouts which were used to mitigate the racing issue but are",
-						"  obsolete now.",
-					] as string[]
-				)
-					.filter(Boolean)
-					.join("\n"),
+				content: generatePromptForBody(maxLength),
 			});
 		}
 
