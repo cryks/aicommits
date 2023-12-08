@@ -185,22 +185,25 @@ export default async (
 					s.stop("Changes analyzed");
 				}
 
-				for (let i = 0; i < messages.length; i++) {
-					const message = messages[i];
-					console.log(`\n# ${i + 1}:\n${message}\n`);
-				}
 				const selected = await select({
 					message: `Pick a commit body to use: ${dim("(Ctrl+c to exit)")}`,
 					maxItems: 10,
 					initialValue: 0,
-					options: messages
-						.map((v) => v.replace(/\n/, " "))
-						.map((value, i) => ({
-							label: `# ${i + 1}: ${
-								value.length > 82 ? value.substring(0, 80) + "..." : value
-							}`,
+					options: messages.map((value, i) => {
+						let msg = "";
+						let summary = "";
+						for (const line of value.split("\n")) {
+							if (line.startsWith("[SUMMARY]")) {
+								summary = line.replace("[SUMMARY]", "").trim();
+							} else {
+								msg += line + "\n";
+							}
+						}
+						return {
+							label: `#${i + 1}:\n${msg.trim()}\n => ${summary}`,
 							value: i,
-						})),
+						};
+					}),
 				});
 				if (isCancel(selected)) {
 					outro("Commit cancelled");
