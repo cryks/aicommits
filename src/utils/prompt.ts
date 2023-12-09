@@ -2,7 +2,9 @@ export const generatePrompt = (maxLength: number) =>
 	[
 		"Generate a concise git commit message written in present tense for the following code diff with the given specifications below, aiming for the best result you can think of:",
 		"* It must always be written in English.",
-		"* It is absolutely essential to write in a single line.",
+		"  * Please add the translation of the generated description in Japanese to the second line.",
+		"    * Only the description should be translated. Please do not translate the type or scope.",
+		"* For the description generated in English, it is absolutely essential to write in a single line.",
 		`* Commit message must be a maximum of ${maxLength} characters.`,
 		"* You should not use words like 'Refactor' or 'Update'.",
 		"* Exclude anything unnecessary such as translation. Your entire response will be passed directly into git commit.",

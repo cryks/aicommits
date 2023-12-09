@@ -117,10 +117,14 @@ export default async (
 					maxItems: 10,
 					initialValue: "",
 					message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
-					options: messages.map((value) => ({
-						label: value.length > 82 ? value.substring(0, 80) + "..." : value,
-						value,
-					})),
+					options: messages.map((value) => {
+						const line = value.split("\n");
+						return {
+							label: line[0],
+							hint: line[1],
+							value: line[0],
+						};
+					}),
 				});
 
 				if (isCancel(selected)) {

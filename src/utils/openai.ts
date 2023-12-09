@@ -110,9 +110,22 @@ const sanitizeMessage = (message: string) =>
 	message
 		.trim()
 		//.replace(/[\n\r]/g, "")
-		.replace(/(\w)\.$/, "$1");
+		.replace(/^```.*?$/gm, "")
+		.replace(/\n{2,}/g, "\n")
+		.replace(/(\w)\.$/, "$1")
+		.trim();
 
-const deduplicateMessages = (array: string[]) => Array.from(new Set(array));
+const deduplicateMessages = (array: string[]) => {
+	const s = new Set<string>();
+	const result: string[] = [];
+	for (const item of array) {
+		const line = item.split("\n");
+		if (s.has(line[0])) continue;
+		s.add(line[0]);
+		result.push(item);
+	}
+	return result;
+};
 
 // const generateStringFromLength = (length: number) => {
 // 	let result = '';
