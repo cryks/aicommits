@@ -119,42 +119,27 @@ export default async (
 				throw new KnownError("No commit messages were generated. Try again.");
 			}
 
-			if (messages.length === 1) {
-				const [message] = messages;
-				const confirmed = await confirm({
-					message: `Use this commit message?\n\n   ${message}\n`,
-				});
+			const selected = await select({
+				maxItems: 10,
+				initialValue: "",
+				message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
+				options: messages.map((value) => {
+					const line = value.split("\n");
+					return {
+						label: line[0],
+						hint: line[1],
+						value: line[0],
+					};
+				}),
+			});
 
-				if (!confirmed || isCancel(confirmed)) {
-					outro("Commit cancelled");
-					return;
-				}
-
-				chats.push({ assistant: message, prompt: "" });
-				return message;
-			} else {
-				const selected = await select({
-					maxItems: 10,
-					initialValue: "",
-					message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
-					options: messages.map((value) => {
-						const line = value.split("\n");
-						return {
-							label: line[0],
-							hint: line[1],
-							value: line[0],
-						};
-					}),
-				});
-
-				if (isCancel(selected)) {
-					outro("Commit cancelled");
-					return;
-				}
-
-				chats.push({ assistant: selected, prompt: "" });
-				return selected;
+			if (isCancel(selected)) {
+				outro("Commit cancelled");
+				return;
 			}
+
+			chats.push({ assistant: selected, prompt: "" });
+			return selected;
 		};
 
 		let message = await choose();
