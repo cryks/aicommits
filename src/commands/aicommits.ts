@@ -40,11 +40,20 @@ export default async (
 		let promptBody: string | undefined = undefined;
 		if (fs.existsSync(promptTitlePath)) {
 			promptTitle = fs.readFileSync(promptTitlePath, "utf-8").trim();
-			log.message("additional prompt(title) detected");
 		}
 		if (fs.existsSync(promptBodyPath)) {
 			promptBody = fs.readFileSync(promptBodyPath, "utf-8").trim();
-			log.message("additional prompt(body) detected");
+		}
+		if (promptTitle || promptBody) {
+			log.step(
+				`Detected additional prompt file${
+					promptTitle && promptBody ? "s" : ""
+				}:\n` +
+					[promptTitle ? "title" : "", promptBody ? "body" : ""]
+						.filter(Boolean)
+						.map((x) => `  * ${x}`)
+						.join("\n")
+			);
 		}
 
 		const detectingFiles = spinner();
