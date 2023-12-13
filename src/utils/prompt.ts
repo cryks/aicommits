@@ -1,4 +1,4 @@
-export const generatePrompt = (maxLength: number) =>
+export const generatePrompt = (maxLength: number, additionalPrompt?: string) =>
 	[
 		"Generate a concise git commit message written in present tense for the following code diff with the given specifications below, aiming for the best result you can think of:",
 		"* It must always be written in English.",
@@ -19,10 +19,17 @@ export const generatePrompt = (maxLength: number) =>
 		"    * For example, `fix(utils): fix typo in foobar.ts` should be `fix(utils/foobar): fix typo`.",
 		"  * You should not include file extensions in the scope.",
 		"    * For example, use `feat(index): add ...` instead of `feat(index.ts): add ...`.",
+		additionalPrompt,
+		"",
 		"Please generate the best commit message that has the above features. Take your time to revise and refine your message until you are confident it's the best expression you can produce. You should not be embarrassed to show this to anyone. Thank you in advance.",
-	].join("\n");
+	]
+		.filter((v) => v !== undefined)
+		.join("\n");
 
-export const generatePromptForBody = (maxLength: number) =>
+export const generatePromptForBody = (
+	maxLength: number,
+	additionalPrompt?: string
+) =>
 	[
 		"Next, please generate the body that will be the Conventional Commits Body.",
 		"This Body Message does not have the restrictions mentioned earlier.",
@@ -32,6 +39,7 @@ export const generatePromptForBody = (maxLength: number) =>
 		`* The maximum number of characters per line should be ${maxLength}.`,
 		"* After inserting appropriate line breaks and after the Body Message, you should write a brief summary in one line starting with the string `[SUMMARY]`, in *Japanese*.",
 		"  * This summary line is not used as a Body Message, so it doesn't matter how long it gets or if it exceeds the maximum number of characters per line.",
+		additionalPrompt,
 		"",
 		"Example (The 'fix:' line is a sample commit message and should not be included in the body message):",
 		"  fix: prevent racing of requests",
@@ -41,4 +49,6 @@ export const generatePromptForBody = (maxLength: number) =>
 		"  ",
 		"  Remove timeouts which were used to mitigate the racing issue but are",
 		"  obsolete now.",
-	].join("\n");
+	]
+		.filter((v) => v !== undefined)
+		.join("\n");

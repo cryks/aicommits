@@ -1,22 +1,26 @@
-import { execa } from "execa";
-import { black, dim, green, red, bgCyan } from "kolorist";
 import {
-	intro,
-	outro,
-	spinner,
-	select,
 	confirm,
+	intro,
 	isCancel,
+	outro,
+	select,
+	spinner,
 	text,
+	log,
 } from "@clack/prompts";
+import { execa } from "execa";
+import { bgCyan, black, dim, green, red } from "kolorist";
+import { getConfig } from "../utils/config.js";
+import { KnownError, handleCliError } from "../utils/error.js";
 import {
 	assertGitRepo,
-	getStagedDiff,
 	getDetectedMessage,
+	getGitDir,
+	getStagedDiff,
 } from "../utils/git.js";
-import { getConfig } from "../utils/config.js";
 import { Chat, generateCommitMessage } from "../utils/openai.js";
-import { KnownError, handleCliError } from "../utils/error.js";
+import path from "node:path";
+import fs from "node:fs";
 
 export default async (
 	generate: number | undefined,
@@ -28,6 +32,20 @@ export default async (
 	(async () => {
 		intro(bgCyan(black(" aicommits ")));
 		await assertGitRepo();
+
+		const gitDir = await getGitDir();
+		const promptTitlePath = path.join(gitDir, "prompt-title");
+		const promptBodyPath = path.join(gitDir, "prompt-body");
+		let promptTitle: string | undefined = undefined;
+		let promptBody: string | undefined = undefined;
+		if (fs.existsSync(promptTitlePath)) {
+			promptTitle = fs.readFileSync(promptTitlePath, "utf-8").trim();
+			log.message("additional prompt(title) detected");
+		}
+		if (fs.existsSync(promptBodyPath)) {
+			promptBody = fs.readFileSync(promptBodyPath, "utf-8").trim();
+			log.message("additional prompt(body) detected");
+		}
 
 		const detectingFiles = spinner();
 
@@ -89,7 +107,9 @@ export default async (
 					config.timeout,
 					config.proxy,
 					hint,
-					chats
+					chats,
+					false,
+					promptTitle
 				);
 			} finally {
 				s.stop("Changes analyzed");
@@ -183,7 +203,8 @@ export default async (
 						config.proxy,
 						hint,
 						chats,
-						true
+						true,
+						promptBody
 					);
 				} finally {
 					s.stop("Changes analyzed");

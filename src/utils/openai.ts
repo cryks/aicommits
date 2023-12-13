@@ -161,7 +161,8 @@ export const generateCommitMessage = async (
 	proxy?: string,
 	hint?: string,
 	chats?: Chat[],
-	requestBody: boolean = false
+	requestBody: boolean = false,
+	additionalPrompt?: string
 ) => {
 	try {
 		const messages: {
@@ -170,7 +171,7 @@ export const generateCommitMessage = async (
 		}[] = [];
 		messages.push({
 			role: "system",
-			content: generatePrompt(maxLength),
+			content: generatePrompt(maxLength, additionalPrompt),
 		});
 		if (hint) {
 			messages.push({
@@ -201,7 +202,7 @@ export const generateCommitMessage = async (
 		if (requestBody) {
 			messages.push({
 				role: "system",
-				content: generatePromptForBody(maxLength),
+				content: generatePromptForBody(maxLength, additionalPrompt),
 			});
 		}
 
