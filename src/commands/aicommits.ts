@@ -51,7 +51,7 @@ export default async (
 				}:\n` +
 					[promptTitle ? "title" : "", promptBody ? "body" : ""]
 						.filter(Boolean)
-						.map((x) => `  * ${x}`)
+						.map((x) => `  ☑️ ${x}`)
 						.join("\n")
 			);
 		}
