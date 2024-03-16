@@ -32,6 +32,7 @@ export type CommitMessage = {
 
 export async function generateCommitMessage(commit: CommitParams) {
 	const messages: Anthropic.Messages.MessageParam[] = [];
+	const leading = "<commits><commit><message>";
 
 	const prompt = generatePromptForClaude(commit.diff, {
 		maxLength: commit.maxLength,
@@ -49,13 +50,16 @@ export async function generateCommitMessage(commit: CommitParams) {
 			role: "assistant",
 			content: chat.assistant,
 		});
-		if (chat.prompt) {
-			messages.push({
-				role: "user",
-				content: chat.prompt,
-			});
-		}
+		messages.push({
+			role: "user",
+			content: chat.prompt,
+		});
 	}
+
+	messages.push({
+		role: "assistant",
+		content: leading,
+	});
 
 	const msg = await anthropic.messages.create({
 		model: "claude-3-opus-20240229",
@@ -65,7 +69,7 @@ export async function generateCommitMessage(commit: CommitParams) {
 	});
 
 	const contents = msg.content.map((x) => x.text);
-	const xml = contents[0].trim();
+	const xml = leading + contents[0].trim();
 	try {
 		const json: Message = await xml2js.parseStringPromise(xml);
 		const result = json.commits.commit.map(
