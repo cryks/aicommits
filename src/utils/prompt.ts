@@ -82,15 +82,21 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 					<format>
 						<![CDATA[
 	<commits>
-	<commit><message>feat(scope): concise description of changes in English</message><japanese>変更内容の簡潔な日本語での説明</japanese></commit>
-	<commit><message>fix(scope): brief summary of another candidate</message><japanese>別の候補の簡潔な日本語での要約</japanese></commit>
+	<commit>
+	<message>feat(scope): concise description of changes in English</message>
+	<japanese>変更内容の簡潔な日本語での説明</japanese>
+	</commit>
+	<commit>
+	<message>fix(scope): brief summary of another candidate</message>
+	<japanese>別の候補の簡潔な日本語での要約</japanese>
+	</commit>
 	</commits>
 						]]>
 					</format>
 				</output>
 			</section>
 			<section>
-				<instruction>Generate the ${n} best commit message candidates enclosed in the specified XML tags, adhering to the above guidelines. The XML output should be compact without any whitespace. Refine the messages to the best of your ability. The output should be presentable to anyone without embarrassment.</instruction>
+				<instruction>Generate the ${n} best commit message candidates enclosed in the specified XML tags, adhering to the above guidelines. The XML output should have no whitespace around tags, but preserve whitespace within the content. Refine the messages to the best of your ability. The output should be presentable to anyone without embarrassment.</instruction>
 			</section>
 		</system>
 	</prompt>
