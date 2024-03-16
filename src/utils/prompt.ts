@@ -78,9 +78,25 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 	<item>Wrap in \`<![CDATA[...]]>\` if \`&lt;\`, \`&gt;\`, \`&amp;\` in content</item>
 	</xml>
 	</specs>
+	<output>
+	<format>
+	<![CDATA[
+	<commits>
+	<commit>
+	<message>feat(scope): concise description of changes in English</message>
+	<japanese>変更内容の簡潔な日本語での説明</japanese>
+	</commit>
+	<commit>
+	<message>fix(scope): brief summary of another candidate</message>
+	<japanese>別の候補の簡潔な日本語での要約</japanese>
+	</commit>
+	</commits>
+	]]>
+	</format>
+	</output>
 	</section>
 	<section>
-	<instruction>Generate the ${n} best commit message candidates in compact XML without spaces around tags. Ensure XML validity. Refine for best quality.</instruction>
+	<instruction>Generate the ${n} best commit message candidates in compact XML without spaces around tags, as shown in the output format. Ensure XML validity. Refine for best quality.</instruction>
 	</section>
 	</system>
 	</prompt>
