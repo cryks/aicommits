@@ -13,6 +13,7 @@ import createHttpsProxyAgent from "https-proxy-agent";
 import { KnownError } from "./error.js";
 import type { CommitType } from "./config.js";
 import { generatePrompt, generatePromptForBody } from "./prompt.js";
+import type { Chat } from "./chat.js";
 
 const httpsPost = async (
 	hostname: string,
@@ -144,11 +145,6 @@ const deduplicateMessages = (array: string[]) => {
 // 	return tokens;
 // };
 
-export type Chat = {
-	assistant: string;
-	prompt: string;
-};
-
 export const generateCommitMessage = async (
 	apiKey: string,
 	model: TiktokenModel,
@@ -211,11 +207,11 @@ export const generateCommitMessage = async (
 			{
 				model,
 				messages,
-				temperature: 0.7,
-				top_p: 1,
-				frequency_penalty: 0,
-				presence_penalty: 0,
-				max_tokens: 200,
+				//temperature: 0.7,
+				//top_p: 1,
+				//frequency_penalty: 0,
+				//presence_penalty: 0,
+				//max_tokens: 200,
 				stream: false,
 				n: completions,
 			},

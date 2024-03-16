@@ -5,6 +5,7 @@ import prepareCommitMessageHook from "./commands/prepare-commit-msg-hook.js";
 import configCommand from "./commands/config.js";
 import hookCommand, { isCalledFromGitHook } from "./commands/hook.js";
 
+process.removeAllListeners("warning");
 const rawArgv = process.argv.slice(2);
 
 cli(

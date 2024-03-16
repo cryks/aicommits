@@ -1,5 +1,5 @@
 import {
-	confirm,
+	//confirm,
 	intro,
 	isCancel,
 	outro,
@@ -18,7 +18,9 @@ import {
 	getGitDir,
 	getStagedDiff,
 } from "../utils/git.js";
-import { Chat, generateCommitMessage } from "../utils/openai.js";
+//import { generateCommitMessage } from "../utils/openai.js";
+import { generateCommitMessage, type CommitMessage } from "../utils/claude.js";
+import { Chat } from "../utils/chat.js";
 import path from "node:path";
 import fs from "node:fs";
 
@@ -101,54 +103,76 @@ export default async (
 		const chats: Chat[] = [];
 
 		const choose = async () => {
-			const s = spinner();
-			s.start("The AI is analyzing your changes");
-			let messages: string[];
-			try {
-				messages = await generateCommitMessage(
-					config.OPENAI_KEY,
-					config.model,
-					config.locale,
-					staged.diff,
-					config.generate,
-					config["max-length"],
-					config.type,
-					config.timeout,
-					config.proxy,
-					hint,
-					chats,
-					false,
-					promptTitle
-				);
-			} finally {
-				s.stop("Changes analyzed");
+			// eslint-disable-next-line no-constant-condition
+			while (true) {
+				const s = spinner();
+				s.start("The AI is analyzing your changes");
+				let messages: CommitMessage[];
+				try {
+					/*
+					messages = await generateCommitMessage(
+						config.OPENAI_KEY,
+						config.model,
+						config.locale,
+						staged.diff,
+						config.generate,
+						config["max-length"],
+						config.type,
+						config.timeout,
+						config.proxy,
+						hint,
+						chats,
+						false,
+						promptTitle
+					);
+					*/
+					messages = await generateCommitMessage({
+						maxLength: config["max-length"],
+						diff: staged.diff,
+						hint,
+						additionalPrompt: promptTitle,
+						requestBody: false,
+						chats,
+					});
+				} finally {
+					s.stop("Changes analyzed");
+				}
+
+				if (messages.length === 0) {
+					throw new KnownError("No commit messages were generated. Try again.");
+				}
+
+				const selected = await select({
+					maxItems: 15,
+					initialValue: "",
+					message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
+					options: [
+						{
+							label: "🔃 Regenerate",
+							hint: "",
+							value: "*REGENERATE*",
+						},
+						...messages.map((value) => {
+							return {
+								label: value.message,
+								hint: value.japanese,
+								value: value.message,
+							};
+						}),
+					],
+				});
+
+				if (isCancel(selected)) {
+					outro("Commit cancelled");
+					return;
+				}
+				if (selected === "*REGENERATE*") {
+					continue;
+				}
+
+				chats.push({ assistant: selected, prompt: "" });
+				return selected;
 			}
-
-			if (messages.length === 0) {
-				throw new KnownError("No commit messages were generated. Try again.");
-			}
-
-			const selected = await select({
-				maxItems: 10,
-				initialValue: "",
-				message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
-				options: messages.map((value) => {
-					const line = value.split("\n");
-					return {
-						label: line[0],
-						hint: line[1],
-						value: line[0],
-					};
-				}),
-			});
-
-			if (isCancel(selected)) {
-				outro("Commit cancelled");
-				return;
-			}
-
-			chats.push({ assistant: selected, prompt: "" });
-			return selected;
 		};
 
 		let message = await choose();
@@ -169,7 +193,8 @@ export default async (
 			if (!message) return;
 		}
 
-		let body = "";
+		/*
+		const body = "";
 		{
 			const confirmed = await confirm({
 				initialValue: false,
@@ -200,6 +225,14 @@ export default async (
 						true,
 						promptBody
 					);
+					messages = await generateCommitMessage({
+						maxLength: config["max-length"],
+						diff: staged.diff,
+						hint,
+						additionalPrompt: promptBody,
+						requestBody: true,
+						chats,
+					});
 				} finally {
 					s.stop("Changes analyzed");
 				}
@@ -234,6 +267,7 @@ export default async (
 				}
 			}
 		}
+		*/
 
 		{
 			const input = await text({
@@ -247,9 +281,11 @@ export default async (
 			message = input;
 		}
 
+		/*
 		if (body) {
 			message += `\n\n${body.trim()}`;
 		}
+		*/
 
 		await execa("git", ["commit", "-m", message, ...rawArgv]);
 
