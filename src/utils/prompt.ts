@@ -48,73 +48,57 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 
 	const systemPrompt = `
 	<prompt>
-		<system>
-			<section>
-				<instruction>Generate ${n} concise git commit message candidates for the given code diff, following the specifications below:</instruction>
-				<specifications>
-					<language>
-						<item>Write each candidate in English.</item>
-						<item>Add the Japanese version of the commit description on the second line enclosed in \`&lt;japanese&gt;\` tags.</item>
-						<item>The Japanese version should explain the meaning of the original commit, not just translate the English.</item>
-						<item>Translate only the description, not the type or scope.</item>
-					</language>
-					<format>
-						<item>Each English description must be a single line.</item>
-						<item>Each message must be at most ${maxLength} characters.</item>
-						<item>Follow the Conventional Commits format.</item>
-						<item>Consolidate multiple types/scopes into one if needed.</item>
-						<item>Use \`build(deps)\` scope when bumping a module.</item>
-						<item>Specify both old and new versions when bumping, e.g., \`build(deps): bump foobar from 1.2.3 to 2.3.4\`.</item>
-						<item>List only the new version when adding a module, e.g., \`build(deps): add foobar@2.3.4\`.</item>
-						<item>Use \`refactor\` type for trivial code changes without operational impact.</item>
-						<item>Use \`perf\` type for performance improvements.</item>
-						<item>Omit 'in ...' and file extensions in scope. Use \`feat(index)\`, not \`feat(index.ts)\`.</item>
-						<item>List only the directory name in scope when a file is under a directory, e.g., \`fix(utils)\`, not \`fix(utils/foobar)\`.</item>
-						<item>Omit scope when type is \`ci\`, e.g., \`ci: ...\`, not \`ci(github): ...\`.</item>
-					</format>
-					<content>
-						<item>Describe the result of the changes, not the changes themselves.</item>
-						<item>Avoid words like 'Refactor', 'Update', 'ensure', 'streamline', 'centralize', 'enhance', 'improve', 'adjust'.</item>
-						<item>Omit unnecessary details like translation or code blocks.</item>
-					</content>
-				</specifications>
-				<output>
-					<format>
-						<![CDATA[
-	<commits>
-	<commit>
-	<message>feat(scope): concise description of changes in English</message>
-	<japanese>変更内容の簡潔な日本語での説明</japanese>
-	</commit>
-	<commit>
-	<message>fix(scope): brief summary of another candidate</message>
-	<japanese>別の候補の簡潔な日本語での要約</japanese>
-	</commit>
-	</commits>
-						]]>
-					</format>
-				</output>
-			</section>
-			<section>
-				<instruction>Generate the ${n} best commit message candidates enclosed in the specified XML tags, adhering to the above guidelines. The XML output should have no whitespace around tags, but preserve whitespace within the content. Refine the messages to the best of your ability. The output should be presentable to anyone without embarrassment.</instruction>
-			</section>
-		</system>
+	<system>
+	<section>
+	<instruction>Generate ${n} concise git commit message candidates for the given diff, following the specs:</instruction>
+	<specs>
+	<language>
+	<item>Write each candidate in English</item>
+	<item>Add Japanese translation on 2nd line in \`&lt;japanese&gt;\` tags</item>
+	<item>Translate only desc, not type/scope</item>
+	</language>
+	<format>
+	<item>English desc must be single line</item>
+	<item>Max ${maxLength} chars per message</item>
+	<item>Follow Conventional Commits format</item>
+	<item>Consolidate multiple types/scopes if needed</item>
+	<item>Use \`build(deps)\` for bumping, \`refactor\` for trivial changes, \`perf\` for perf improvements</item>
+	<item>Omit 'in...', extensions in scope</item>
+	<item>Only dir name in scope if file in subdir</item>
+	<item>Omit scope for \`ci\` type</item>
+	</format>
+	<content>
+	<item>Desc result, not changes themselves</item>
+	<item>Avoid: Refactor, Update, ensure, streamline, centralize, enhance, improve, adjust</item>
+	<item>Omit unneeded details</item>
+	</content>
+	<xml>
+	<item>Output must be valid XML</item>
+	<item>Escape \`&amp;\`, \`&lt;\`, \`&gt;\`, \`&quot;\`, \`&apos;\`</item>
+	<item>Wrap in \`<![CDATA[...]]>\` if \`&lt;\`, \`&gt;\`, \`&amp;\` in content</item>
+	</xml>
+	</specs>
+	</section>
+	<section>
+	<instruction>Generate the ${n} best commit message candidates in compact XML without spaces around tags. Ensure XML validity. Refine for best quality.</instruction>
+	</section>
+	</system>
 	</prompt>
 	`;
 
 	const userPrompt = `
 	<prompt>
-		<user>
-			<diff>
-				<![CDATA[
+	<user>
+	<diff>
+	<![CDATA[
 	${diff}
-				]]>
-			</diff>
-			<hint>
-				<item>If provided, use the hint below to describe the commit, but primarily rely on the code diff:</item>
-				<item>${hint}</item>
-			</hint>
-		</user>
+	]]>
+	</diff>
+	<hint>
+	<item>If provided, use hint to describe commit, but rely mainly on diff:</item>
+	<item>${hint}</item>
+	</hint>
+	</user>
 	</prompt>
 	`;
 
