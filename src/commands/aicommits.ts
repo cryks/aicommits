@@ -133,6 +133,7 @@ export default async (
 						additionalPrompt: promptTitle,
 						requestBody: false,
 						chats,
+						n: config.generate,
 					});
 				} finally {
 					s.stop("Changes analyzed");

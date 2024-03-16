@@ -14,6 +14,7 @@ export type CommitParams = {
 	additionalPrompt?: string;
 	requestBody: boolean;
 	chats: Chat[];
+	n: number;
 };
 
 type Message = {
@@ -37,7 +38,7 @@ export async function generateCommitMessage(commit: CommitParams) {
 	const prompt = generatePromptForClaude(commit.diff, {
 		maxLength: commit.maxLength,
 		hint: commit.hint,
-		n: 10,
+		n: commit.n,
 	});
 
 	messages.push({
