@@ -60,17 +60,31 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 	<format>
 	<item>English desc must be single line</item>
 	<item>Max ${maxLength} chars per message</item>
-	<item>Follow Conventional Commits format</item>
+	<item>Follow Conventional Commits format:</item>
+	<item>- Prefix with type (noun like feat, fix) and OPTIONAL scope</item>
+	<item>- Use ! before : for BREAKING CHANGE</item>
+	<item>- Follow with REQUIRED : and space</item>
+	<item>- Short summary after : (e.g., fix: array parsing issue)</item>
 	<item>Consolidate multiple types/scopes if needed</item>
-	<item>Use \`build(deps)\` for bumping, \`refactor\` for trivial changes, \`perf\` for perf improvements</item>
-	<item>Omit 'in...', extensions in scope</item>
-	<item>Only dir name in scope if file in subdir</item>
 	<item>Omit scope for \`ci\` type</item>
 	</format>
+	<types>
+	<item>Use \`feat\` for new features</item>
+	<item>Use \`fix\` for bug fixes</item>
+	<item>Use \`build(deps)\` for dependency updates</item>
+	<item>Use \`refactor\` for code changes without feature/fix</item>
+	<item>Use \`perf\` for performance improvements</item>
+	<item>Use other types as needed (e.g., docs, style, test)</item>
+	</types>
+	<scope>
+	<item>Scope is OPTIONAL noun describing code section</item>
+	<item>Surround scope with parentheses, e.g., (parser)</item>
+	<item>Omit unneeded details</item>
+	<item>Only dir name in scope if file in subdir</item>
+	</scope>
 	<content>
 	<item>Desc result, not changes themselves</item>
 	<item>Avoid: Refactor, Update, ensure, streamline, centralize, enhance, improve, adjust</item>
-	<item>Omit unneeded details</item>
 	</content>
 	<xml>
 	<item>Output must be valid XML</item>
