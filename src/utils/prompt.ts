@@ -96,7 +96,7 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 	</output>
 	</section>
 	<section>
-	<instruction>Generate the ${n} best commit message candidates in compact XML without spaces around tags, as shown in the output format. Ensure XML validity. Refine for best quality.</instruction>
+	<instruction>Generate the ${n} best commit message candidates in compact XML without spaces around tags, as shown in the output format. Order the candidates from most to least fitting based on your assessment. Ensure XML validity. Refine for best quality.</instruction>
 	</section>
 	</system>
 	</prompt>
