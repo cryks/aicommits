@@ -64,13 +64,15 @@ export async function generateCommitMessage(commit: CommitParams) {
 
 	const msg = await anthropic.messages.create({
 		model: "claude-3-opus-20240229",
-		max_tokens: 2048,
+		max_tokens: 1000,
+		temperature: 1.0,
 		system: prompt.systemPrompt,
+		stop_sequences: ["</commits>"],
 		messages,
 	});
 
 	const contents = msg.content.map((x) => x.text);
-	const xml = leading + contents[0].trim();
+	const xml = leading + contents[0].trim() + (msg.stop_sequence ?? "");
 	try {
 		const json: Message = await xml2js.parseStringPromise(xml);
 		const result = json.commits.commit.map(
