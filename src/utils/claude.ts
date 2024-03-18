@@ -74,7 +74,10 @@ export async function generateCommitMessage(commit: CommitParams) {
 	const contents = msg.content.map((x) => x.text);
 	const xml = leading + contents[0].trim() + (msg.stop_sequence ?? "");
 	try {
-		const json: Message = await xml2js.parseStringPromise(xml);
+		const json: Message = await xml2js.parseStringPromise(xml, {
+			strict: false,
+			normalizeTags: true,
+		});
 		const result = json.commits.commit.map(
 			(x): CommitMessage => ({
 				message: x.message[0],
