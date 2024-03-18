@@ -55,7 +55,7 @@ const configParsers = {
 
 		const parsed = Number(count);
 		parseAssert("generate", parsed > 0, "Must be greater than 0");
-		parseAssert("generate", parsed <= 10, "Must be less or equal to 10");
+		parseAssert("generate", parsed <= 30, "Must be less or equal to 30");
 
 		return parsed;
 	},
