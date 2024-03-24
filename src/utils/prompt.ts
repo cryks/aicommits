@@ -2,6 +2,8 @@ type PromptConfig = {
 	maxLength: number;
 	hint?: string;
 	n: number;
+	additionalPrompt?: string;
+	isNuxtProject?: boolean;
 };
 
 export const generatePrompt = (maxLength: number, additionalPrompt?: string) =>
@@ -43,6 +45,7 @@ export const generatePrompt = (maxLength: number, additionalPrompt?: string) =>
 		.filter((v) => v !== undefined)
 		.join("\n");
 
+/*
 export function generatePromptForClaude(diff: string, config: PromptConfig) {
 	const { maxLength, hint, n } = config;
 
@@ -51,66 +54,42 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 	<system>
 	<section>
 	<instruction>Generate ${n} concise git commit message candidates for the given diff, following the specs:</instruction>
-	<specs>
 	<language>
-	<item>Write each candidate in English</item>
-	<item>Add Japanese translation on 2nd line in \`&lt;japanese&gt;\` tags</item>
-	<item>Translate only desc, not type/scope</item>
+	<item>Write each message in English, with Japanese translation in the "japanese" field</item>
+	<item>Only translate the description, not the type or scope</item>
 	</language>
 	<format>
-	<item>English desc must be single line</item>
-	<item>Max ${maxLength} chars per message</item>
-	<item>Follow Conventional Commits format:</item>
-	<item>- Prefix with type (noun like feat, fix) and OPTIONAL scope</item>
-	<item>- Use ! before : for BREAKING CHANGE</item>
-	<item>- Follow with REQUIRED : and space</item>
-	<item>- Short summary after : (e.g., fix: array parsing issue)</item>
-	<item>Consolidate multiple types/scopes if needed</item>
-	<item>Omit scope for \`ci\` type</item>
+	<item>Follow Conventional Commits format</item>
+	<item>English message must be a single line, max ${maxLength} chars</item>
+	<item>Consolidate multiple types/scopes into one if needed</item>
+	<item>Set scope to \`build(deps)\` when bumping dependencies</item>
+	<item>Use \`refactor\` type for trivial code changes without logic impact</item>
+	<item>Omit 'in ...' phrases and file extensions from scope</item>
+	<item>If file is in subdir, only include the subdir name in scope, not full path</item>
 	</format>
-	<types>
-	<item>Use \`feat\` for new features</item>
-	<item>Use \`fix\` for bug fixes</item>
-	<item>Use \`build(deps)\` for dependency updates</item>
-	<item>Use \`refactor\` for code changes without feature/fix</item>
-	<item>Use \`perf\` for performance improvements</item>
-	<item>Use other types as needed (e.g., docs, style, test)</item>
-	</types>
-	<scope>
-	<item>Scope is OPTIONAL noun describing code section</item>
-	<item>Surround scope with parentheses, e.g., (parser)</item>
-	<item>Omit unneeded details</item>
-	<item>Only dir name in scope if file in subdir</item>
-	</scope>
 	<content>
-	<item>Desc result, not changes themselves</item>
-	<item>Avoid: Refactor, Update, ensure, streamline, centralize, enhance, improve, adjust</item>
+	<item>Describe the result of the changes, not the changes themselves</item>
+	<item>Avoid generic terms like Refactor, Update, Adjust, Improve, etc.</item>
 	</content>
-	<xml>
-	<item>Output must be valid XML</item>
-	<item>Escape \`&amp;\`, \`&lt;\`, \`&gt;\`, \`&quot;\`, \`&apos;\`</item>
-	<item>Wrap in \`<![CDATA[...]]>\` if \`&lt;\`, \`&gt;\`, \`&amp;\` in content</item>
-	</xml>
-	</specs>
 	<output>
-	<format>
-	<![CDATA[
-	<commits>
-	<commit>
-	<message>feat(scope): concise description of changes in English</message>
-	<japanese>変更内容の簡潔な日本語での説明</japanese>
-	</commit>
-	<commit>
-	<message>fix(scope): brief summary of another candidate</message>
-	<japanese>別の候補の簡潔な日本語での要約</japanese>
-	</commit>
-	</commits>
-	]]>
-	</format>
+	<item>Output valid JSON as shown in example</item>
+	<item>Wrap the commits array in a "commits" object</item>
 	</output>
+	<example>
+	<![CDATA[
+	{
+		"commits": [
+			{
+				"message": "feat(scope): concise description of changes in English",
+				"japanese": "変更内容の簡潔な日本語での説明"
+			}
+		]
+	}
+	]]>
+	</example>
 	</section>
 	<section>
-	<instruction>Generate the ${n} best commit message candidates in compact XML without spaces around tags, as shown in the output format. Order the candidates from most to least fitting based on your assessment. Ensure XML validity. Refine for best quality.</instruction>
+	<instruction>Generate the ${n} best commit message candidates based on the diff, ordered from most to least fitting. Rely mainly on the diff, but also consider the hint if provided. Ensure valid JSON output matching the example format.</instruction>
 	</section>
 	</system>
 	</prompt>
@@ -133,6 +112,90 @@ export function generatePromptForClaude(diff: string, config: PromptConfig) {
 	`;
 
 	return { systemPrompt, userPrompt };
+}
+*/
+
+// prettier-ignore
+export function generatePromptJSON(diff: string, config: PromptConfig) {
+  const { maxLength, hint, n, additionalPrompt, isNuxtProject } = config;
+
+  const systemPrompt = `
+  Please generate ${n} concise git commit message candidates for the given diff, following these specifications:
+
+  <language>
+  - Write each message in English, with a Japanese translation in the "japanese" field
+  - Only translate the description part, not the type or scope
+  </language>
+
+  <format>
+  - Follow the Conventional Commits format
+  - English message should be a single line, max ${maxLength} characters
+  - Consolidate multiple types/scopes into one if needed
+  - Set scope to \`build(deps)\` when bumping dependencies
+  - Use \`refactor\` type for trivial code changes without logic impact
+  - Omit 'in ...' phrases and file extensions from scope
+  - If file is in a subdir, only include the subdir name in scope, not the full path
+  </format>
+
+  <content>
+  - Describe the result of the changes, not the changes themselves
+  - Avoid generic terms like Refactor, Update, Adjust, Improve, etc.
+  </content>
+
+	${isNuxtProject ? `
+	<nuxt_considerations>
+	- Use \`nuxt\` as the scope for Nuxt-specific changes (e.g., nuxt.config, plugins, modules)
+	- Use \`pages\` as the scope for changes to pages/ directory
+	- Use \`components\` as the scope for changes to components/ directory
+	- Use \`store\` as the scope for changes related to Vuex store
+	- Use \`i18n\` as the scope for internationalization related changes
+	- Use \`ssr\` as the scope for server-side rendering specific changes
+	- Prefer more specific scopes like \`nuxt(config)\`, \`nuxt(plugin)\`, \`nuxt(module)\` when applicable
+	- Mention the specific page, component, or feature in the description when relevant
+	</nuxt_considerations>
+	` : ''}
+
+  ${additionalPrompt ? `
+  <additional_prompt>
+  ${additionalPrompt}
+  </additional_prompt>
+  ` : ''}
+
+  <output>
+  - Output valid JSON as shown in this example:
+  {
+    "commits": [
+      {
+        "message": "feat(scope): concise description of changes in English",
+        "japanese": "変更内容の簡潔な日本語での説明"
+      }
+    ]
+  }
+  </output>
+
+  Generate the ${n} most appropriate commit message candidates based mainly on the diff, but also consider the hint if provided. Ensure the JSON output is valid and matches the example format.
+
+	${isNuxtProject ? `
+	If there are any contradictions between the <nuxt_considerations> and the rest of the prompt, prioritize the <nuxt_considerations>.
+	` : ''}
+
+  ${additionalPrompt ? `
+  If there are any contradictions between the <additional_prompt> and the base prompt, prioritize the <additional_prompt>.
+  ` : ''}
+  `;
+
+  const userPrompt = `
+  <diff>
+  ${diff}
+  </diff>
+
+  <hint>
+  If provided, use the hint to describe the commit, but rely mainly on the diff:
+  ${hint}
+  </hint>
+  `;
+
+  return { systemPrompt, userPrompt };
 }
 
 export const generatePromptForBody = (

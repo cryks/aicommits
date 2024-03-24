@@ -2,27 +2,45 @@ import {
 	//confirm,
 	intro,
 	isCancel,
+	log,
 	outro,
 	select,
 	spinner,
 	text,
-	log,
 } from "@clack/prompts";
 import { execa } from "execa";
 import { bgCyan, black, dim, green, red } from "kolorist";
+import fs from "node:fs";
+import path from "node:path";
+import type { AssistantResponse, Model } from "../utils/assistant.js";
+import { Chat } from "../utils/chat.js";
+import { generateCommitMessage as useAnthropic } from "../utils/claude.js";
 import { getConfig } from "../utils/config.js";
 import { KnownError, handleCliError } from "../utils/error.js";
 import {
 	assertGitRepo,
 	getDetectedMessage,
 	getGitDir,
+	getGitTopDir,
 	getStagedDiff,
 } from "../utils/git.js";
-//import { generateCommitMessage } from "../utils/openai.js";
-import { generateCommitMessage, type CommitMessage } from "../utils/claude.js";
-import { Chat } from "../utils/chat.js";
-import path from "node:path";
-import fs from "node:fs";
+import { generateCommitMessage as useOpenAI } from "../utils/openai.js";
+
+type AIVendor = "anthropic" | "openai";
+type AIModel = Model;
+type AIModelVendor = { vendor: AIVendor } & { model: AIModel };
+
+async function inferProjectType() {
+	const gitDir = await getGitTopDir();
+
+	const isNuxtProject = ["nuxt.config.js", "nuxt.config.ts"].some((file) =>
+		fs.existsSync(path.join(gitDir, file))
+	);
+
+	return {
+		isNuxtProject,
+	};
+}
 
 export default async (
 	generate: number | undefined,
@@ -35,6 +53,11 @@ export default async (
 		intro(bgCyan(black(" aicommits ")));
 		await assertGitRepo();
 
+		const inferredProjectType = await inferProjectType();
+		if (inferredProjectType.isNuxtProject) {
+			log.step("🚀 Nuxt.js project");
+		}
+
 		const gitDir = await getGitDir();
 		const promptTitlePath = path.join(gitDir, "prompt-title");
 		const promptBodyPath = path.join(gitDir, "prompt-body");
@@ -46,16 +69,11 @@ export default async (
 		if (fs.existsSync(promptBodyPath)) {
 			promptBody = fs.readFileSync(promptBodyPath, "utf-8").trim();
 		}
-		if (promptTitle || promptBody) {
-			log.step(
-				`Detected additional prompt file${
-					promptTitle && promptBody ? "s" : ""
-				}:\n` +
-					[promptTitle ? "title" : "", promptBody ? "body" : ""]
-						.filter(Boolean)
-						.map((x) => `  ☑️ ${x}`)
-						.join("\n")
-			);
+		if (promptTitle) {
+			log.step("📝 Prompt title found");
+		}
+		if (promptBody) {
+			log.step("🔍 Prompt body found");
 		}
 
 		const detectingFiles = spinner();
@@ -90,6 +108,28 @@ export default async (
 			type: commitType?.toString(),
 		});
 
+		const aiModel = await select({
+			message: "Choose an AI model to use:",
+			initialValue: { vendor: "anthropic", model: "high" } as AIModelVendor,
+			options: [
+				{
+					label: "Claude 3 Opus",
+					value: { vendor: "anthropic", model: "high" },
+				},
+				{
+					label: "GPT-4 Turbo",
+					value: { vendor: "openai", model: "high" },
+				},
+			],
+		});
+		if (isCancel(aiModel)) {
+			outro("Commit cancelled");
+			return;
+		}
+
+		const generateCommitMessage =
+			aiModel.vendor === "anthropic" ? useAnthropic : useOpenAI;
+
 		let hint: string | undefined = undefined;
 		const i = await text({
 			message: "Enter a hint to help the AI generate a commit message:",
@@ -107,26 +147,9 @@ export default async (
 			while (true) {
 				const s = spinner();
 				s.start("The AI is analyzing your changes");
-				let messages: CommitMessage[];
+				let response: AssistantResponse;
 				try {
-					/*
-					messages = await generateCommitMessage(
-						config.OPENAI_KEY,
-						config.model,
-						config.locale,
-						staged.diff,
-						config.generate,
-						config["max-length"],
-						config.type,
-						config.timeout,
-						config.proxy,
-						hint,
-						chats,
-						false,
-						promptTitle
-					);
-					*/
-					messages = await generateCommitMessage({
+					response = await generateCommitMessage(aiModel.model, {
 						maxLength: config["max-length"],
 						diff: staged.diff,
 						hint,
@@ -134,13 +157,10 @@ export default async (
 						requestBody: false,
 						chats,
 						n: config.generate,
+						...inferredProjectType,
 					});
 				} finally {
 					s.stop("Changes analyzed");
-				}
-
-				if (messages.length === 0) {
-					throw new KnownError("No commit messages were generated. Try again.");
 				}
 
 				const selected = await select({
@@ -153,13 +173,18 @@ export default async (
 							hint: "",
 							value: "*REGENERATE*",
 						},
-						...messages.map((value) => {
+						...response.messages.map((value) => {
 							return {
 								label: value.message,
 								hint: value.japanese,
 								value: value.message,
 							};
 						}),
+						{
+							label: "🔃 More Request",
+							hint: "",
+							value: "*MOREREQ*",
+						},
 					],
 				});
 
@@ -169,106 +194,25 @@ export default async (
 				}
 				if (selected === "*REGENERATE*") {
 					continue;
+				} else if (selected === "*MOREREQ*") {
+					const input = await text({
+						message: "Additional requests to the assistant:",
+					});
+					if (isCancel(input) || !input) {
+						outro("Commit cancelled");
+						return;
+					}
+
+					chats.push({ assistant: response.rawResponse, prompt: input });
+					continue;
 				}
 
-				chats.push({ assistant: selected, prompt: "" });
 				return selected;
 			}
 		};
 
 		let message = await choose();
 		if (!message) return;
-
-		for (;;) {
-			const input = await text({
-				message: "Additional requests to the assistant:",
-			});
-			if (isCancel(input)) {
-				outro("Commit cancelled");
-				return;
-			}
-			if (!input) break;
-
-			chats[chats.length - 1].prompt = input;
-			message = await choose();
-			if (!message) return;
-		}
-
-		/*
-		const body = "";
-		{
-			const confirmed = await confirm({
-				initialValue: false,
-				message: "Do you want to add a body?",
-			});
-			if (isCancel(confirmed)) {
-				outro("Commit cancelled");
-				return;
-			}
-
-			if (confirmed) {
-				const s = spinner();
-				s.start("The AI is analyzing your changes");
-				let messages: string[];
-				try {
-					messages = await generateCommitMessage(
-						config.OPENAI_KEY,
-						config.model,
-						config.locale,
-						staged.diff,
-						5,
-						config["max-length"],
-						config.type,
-						config.timeout,
-						config.proxy,
-						hint,
-						chats,
-						true,
-						promptBody
-					);
-					messages = await generateCommitMessage({
-						maxLength: config["max-length"],
-						diff: staged.diff,
-						hint,
-						additionalPrompt: promptBody,
-						requestBody: true,
-						chats,
-					});
-				} finally {
-					s.stop("Changes analyzed");
-				}
-
-				const selected = await select({
-					message: `Pick a commit body to use: ${dim("(Ctrl+c to exit)")}`,
-					maxItems: 10,
-					initialValue: 0,
-					options: messages.map((value, i) => {
-						let msg = "";
-						let summary = "";
-						for (const line of value.split("\n")) {
-							if (line.startsWith("[SUMMARY]")) {
-								summary = line.replace("[SUMMARY]", "").trim();
-							} else {
-								msg += line + "\n";
-							}
-						}
-						return {
-							label: `#${i + 1}:\n${msg.trim()}\n => ${summary}`,
-							value: i,
-						};
-					}),
-				});
-				if (isCancel(selected)) {
-					outro("Commit cancelled");
-					return;
-				}
-				for (const line of messages[selected].split("\n")) {
-					if (line.startsWith("[SUMMARY]")) continue;
-					body += line + "\n";
-				}
-			}
-		}
-		*/
 
 		{
 			const input = await text({
@@ -281,12 +225,6 @@ export default async (
 			}
 			message = input;
 		}
-
-		/*
-		if (body) {
-			message += `\n\n${body.trim()}`;
-		}
-		*/
 
 		await execa("git", ["commit", "-m", message, ...rawArgv]);
 

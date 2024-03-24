@@ -1,45 +1,24 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { Chat } from "./chat.js";
-import { generatePromptForClaude } from "./prompt.js";
-import xml2js from "xml2js";
+import type {
+	AssistantResponse,
+	CommitParams,
+	GeneratedCommitMessages,
+	Model,
+} from "./assistant.js";
+import { generatePromptJSON } from "./prompt.js";
 
 const anthropic = new Anthropic({
-	apiKey: process.env.CLAUDE_API_KEY,
+	apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-export type CommitParams = {
-	maxLength: number;
-	diff: string;
-	hint?: string;
-	additionalPrompt?: string;
-	requestBody: boolean;
-	chats: Chat[];
-	n: number;
-};
-
-type Message = {
-	commits: {
-		commit: {
-			message: string[];
-			japanese: string[];
-		}[];
-	};
-};
-
-export type CommitMessage = {
-	message: string;
-	japanese: string;
-};
-
-export async function generateCommitMessage(commit: CommitParams) {
+export async function generateCommitMessage(
+	model: Model,
+	commit: CommitParams
+): Promise<AssistantResponse> {
 	const messages: Anthropic.Messages.MessageParam[] = [];
-	const leading = "<commits><commit><message>";
+	const leading = "{";
 
-	const prompt = generatePromptForClaude(commit.diff, {
-		maxLength: commit.maxLength,
-		hint: commit.hint,
-		n: commit.n,
-	});
+	const prompt = generatePromptJSON(commit.diff, commit);
 
 	messages.push({
 		role: "user",
@@ -63,31 +42,28 @@ export async function generateCommitMessage(commit: CommitParams) {
 	});
 
 	const msg = await anthropic.messages.create({
-		model: "claude-3-opus-20240229",
+		model:
+			model === "high"
+				? "claude-3-opus-20240229"
+				: model === "middle"
+				? "claude-3-sonnet-20240229"
+				: "claude-3-haiku-20240307",
 		max_tokens: 1000,
-		temperature: 1.0,
+		temperature: 0,
 		system: prompt.systemPrompt,
-		stop_sequences: ["</commits>"],
 		messages,
 	});
 
 	const contents = msg.content.map((x) => x.text);
-	const xml = leading + contents[0].trim() + (msg.stop_sequence ?? "");
+	const content = leading + contents[0].trim() + (msg.stop_sequence ?? "");
 	try {
-		const json: Message = await xml2js.parseStringPromise(xml, {
-			strict: false,
-			normalizeTags: true,
-		});
-		const result = json.commits.commit.map(
-			(x): CommitMessage => ({
-				message: x.message[0],
-				japanese: x.japanese[0],
-			})
-		);
-
-		return result;
+		const generated = JSON.parse(content) as GeneratedCommitMessages;
+		return {
+			rawResponse: content,
+			messages: generated.commits,
+		};
 	} catch (ex) {
-		console.dir(xml, { depth: null });
+		console.dir(content, { depth: null });
 		throw ex;
 	}
 }

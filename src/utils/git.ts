@@ -15,6 +15,15 @@ export const assertGitRepo = async () => {
 	return stdout;
 };
 
+export const getGitTopDir = async () => {
+	try {
+		const { stdout } = await execa("git", ["rev-parse", "--show-toplevel"]);
+		return stdout;
+	} catch (error) {
+		throw new Error(`Error finding git directory: ${error}`);
+	}
+};
+
 export const getGitDir = async () => {
 	try {
 		const { stdout } = await execa("git", ["rev-parse", "--git-dir"]);
