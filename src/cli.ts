@@ -31,18 +31,6 @@ cli(
 				description: "Files to exclude from AI analysis",
 				alias: "x",
 			},
-			all: {
-				type: Boolean,
-				description:
-					"Automatically stage changes in tracked files for the commit",
-				alias: "a",
-				default: false,
-			},
-			type: {
-				type: String,
-				description: "Type of commit message to generate",
-				alias: "t",
-			},
 		},
 
 		commands: [configCommand, hookCommand],
@@ -57,13 +45,7 @@ cli(
 		if (isCalledFromGitHook) {
 			prepareCommitMessageHook();
 		} else {
-			aicommits(
-				argv.flags.generate,
-				argv.flags.exclude,
-				argv.flags.all,
-				argv.flags.type,
-				rawArgv
-			);
+			aicommits(argv.flags.generate, argv.flags.exclude, rawArgv);
 		}
 	},
 	rawArgv

@@ -2,7 +2,6 @@ import fs from "fs/promises";
 import path from "path";
 import os from "os";
 import ini from "ini";
-import type { TiktokenModel } from "@dqbd/tiktoken";
 import { fileExists } from "./fs.js";
 import { KnownError } from "./error.js";
 
@@ -22,30 +21,6 @@ const parseAssert = (name: string, condition: any, message: string) => {
 };
 
 const configParsers = {
-	OPENAI_KEY(key?: string) {
-		if (!key) {
-			throw new KnownError(
-				"Please set your OpenAI API key via `aicommits config set OPENAI_KEY=<your token>`"
-			);
-		}
-		parseAssert("OPENAI_KEY", key.startsWith("sk-"), 'Must start with "sk-"');
-		// Key can range from 43~51 characters. There's no spec to assert this.
-
-		return key;
-	},
-	locale(locale?: string) {
-		if (!locale) {
-			return "en";
-		}
-
-		parseAssert("locale", locale, "Cannot be empty");
-		parseAssert(
-			"locale",
-			/^[a-z-]+$/i.test(locale),
-			"Must be a valid locale (letters and dashes/underscores). You can consult the list of codes in: https://wikipedia.org/wiki/List_of_ISO_639-1_codes"
-		);
-		return locale;
-	},
 	generate(count?: string) {
 		if (!count) {
 			return 1;
@@ -56,47 +31,6 @@ const configParsers = {
 		const parsed = Number(count);
 		parseAssert("generate", parsed > 0, "Must be greater than 0");
 		parseAssert("generate", parsed <= 30, "Must be less or equal to 30");
-
-		return parsed;
-	},
-	type(type?: string) {
-		if (!type) {
-			return "";
-		}
-
-		parseAssert(
-			"type",
-			commitTypes.includes(type as CommitType),
-			"Invalid commit type"
-		);
-
-		return type as CommitType;
-	},
-	proxy(url?: string) {
-		if (!url || url.length === 0) {
-			return undefined;
-		}
-
-		parseAssert("proxy", /^https?:\/\//.test(url), "Must be a valid URL");
-
-		return url;
-	},
-	model(model?: string) {
-		if (!model || model.length === 0) {
-			return "gpt-3.5-turbo";
-		}
-
-		return model as TiktokenModel;
-	},
-	timeout(timeout?: string) {
-		if (!timeout) {
-			return 10_000;
-		}
-
-		parseAssert("timeout", /^\d+$/.test(timeout), "Must be an integer");
-
-		const parsed = Number(timeout);
-		parseAssert("timeout", parsed >= 500, "Must be greater than 500ms");
 
 		return parsed;
 	},

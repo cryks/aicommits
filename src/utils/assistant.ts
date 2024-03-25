@@ -7,7 +7,6 @@ export type CommitParams = {
 	diff: string;
 	hint?: string;
 	additionalPrompt?: string;
-	requestBody: boolean;
 	chats: Chat[];
 	n: number;
 	isNuxtProject: boolean;

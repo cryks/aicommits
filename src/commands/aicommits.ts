@@ -45,8 +45,6 @@ async function inferProjectType() {
 export default async (
 	generate: number | undefined,
 	excludeFiles: string[],
-	stageAll: boolean,
-	commitType: string | undefined,
 	rawArgv: string[]
 ) =>
 	(async () => {
@@ -78,11 +76,6 @@ export default async (
 
 		const detectingFiles = spinner();
 
-		if (stageAll) {
-			// This should be equivalent behavior to `git commit --all`
-			await execa("git", ["add", "--update"]);
-		}
-
 		detectingFiles.start("Detecting staged files");
 		const staged = await getStagedDiff(excludeFiles);
 
@@ -99,13 +92,8 @@ export default async (
 				.join("\n")}`
 		);
 
-		const { env } = process;
 		const config = await getConfig({
-			OPENAI_KEY: env.OPENAI_KEY || env.OPENAI_API_KEY,
-			proxy:
-				env.https_proxy || env.HTTPS_PROXY || env.http_proxy || env.HTTP_PROXY,
 			generate: generate?.toString(),
-			type: commitType?.toString(),
 		});
 
 		const aiModel = await select({
@@ -154,7 +142,6 @@ export default async (
 						diff: staged.diff,
 						hint,
 						additionalPrompt: promptTitle,
-						requestBody: false,
 						chats,
 						n: config.generate,
 						...inferredProjectType,
