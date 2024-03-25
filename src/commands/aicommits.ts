@@ -108,6 +108,14 @@ export default async (
 					label: "GPT-4 Turbo",
 					value: { vendor: "openai", model: "high" },
 				},
+				{
+					label: "Claude 3 Sonnet",
+					value: { vendor: "anthropic", model: "middle" },
+				},
+				{
+					label: "Claude 3 Haiku",
+					value: { vendor: "anthropic", model: "low" },
+				},
 			],
 		});
 		if (isCancel(aiModel)) {
