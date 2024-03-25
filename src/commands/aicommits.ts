@@ -65,21 +65,17 @@ export default async (
 			log.step("📝 Prompt title found");
 		}
 
-		const detectingFiles = spinner();
-
-		detectingFiles.start("Detecting staged files");
 		const staged = await getStagedDiff(excludeFiles);
 
 		if (!staged) {
-			detectingFiles.stop("Detecting staged files");
 			throw new KnownError(
 				"No staged changes found. Stage your changes manually, or automatically stage all changes with the `--all` flag."
 			);
 		}
 
-		detectingFiles.stop(
+		log.step(
 			`${getDetectedMessage(staged.files)}:\n${staged.files
-				.map((file) => `     ${file}`)
+				.map((file) => `  ${file}`)
 				.join("\n")}`
 		);
 
