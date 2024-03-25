@@ -42,8 +42,6 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   - Use \`composables\` as the scope for changes to composables/ directory
   - Use \`server\` as the scope for changes to server/ directory and server-side API components
   - Use \`store\` as the scope for changes related to Vuex store
-  - Use \`i18n\` as the scope for internationalization related changes
-  - Use \`ssr\` as the scope for server-side rendering specific changes
   - Use \`assets\` as the scope for changes to assets/ directory (e.g., images, fonts, css)
   - Use \`layouts\` as the scope for changes to layouts/ directory
   - Use \`middleware\` as the scope for changes to middleware/ directory
