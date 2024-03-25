@@ -17,12 +17,14 @@ export type GeneratedCommitMessages = {
 	commits: {
 		message: string;
 		japanese: string;
+		score: number;
 	}[];
 };
 
 export type CommitMessage = {
 	message: string;
 	japanese: string;
+	score: number;
 };
 
 export type AssistantResponse = {

@@ -175,7 +175,9 @@ export default async (
 						},
 						...response.messages.map((value) => {
 							return {
-								label: value.message,
+								label: `[${String(value.score).padStart(2, " ")}] ${
+									value.message
+								}`,
 								hint: value.japanese,
 								value: value.message,
 							};

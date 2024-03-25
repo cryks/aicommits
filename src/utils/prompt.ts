@@ -47,71 +47,71 @@ export const generatePrompt = (maxLength: number, additionalPrompt?: string) =>
 
 /*
 export function generatePromptForClaude(diff: string, config: PromptConfig) {
-	const { maxLength, hint, n } = config;
+  const { maxLength, hint, n } = config;
 
-	const systemPrompt = `
-	<prompt>
-	<system>
-	<section>
-	<instruction>Generate ${n} concise git commit message candidates for the given diff, following the specs:</instruction>
-	<language>
-	<item>Write each message in English, with Japanese translation in the "japanese" field</item>
-	<item>Only translate the description, not the type or scope</item>
-	</language>
-	<format>
-	<item>Follow Conventional Commits format</item>
-	<item>English message must be a single line, max ${maxLength} chars</item>
-	<item>Consolidate multiple types/scopes into one if needed</item>
-	<item>Set scope to \`build(deps)\` when bumping dependencies</item>
-	<item>Use \`refactor\` type for trivial code changes without logic impact</item>
-	<item>Omit 'in ...' phrases and file extensions from scope</item>
-	<item>If file is in subdir, only include the subdir name in scope, not full path</item>
-	</format>
-	<content>
-	<item>Describe the result of the changes, not the changes themselves</item>
-	<item>Avoid generic terms like Refactor, Update, Adjust, Improve, etc.</item>
-	</content>
-	<output>
-	<item>Output valid JSON as shown in example</item>
-	<item>Wrap the commits array in a "commits" object</item>
-	</output>
-	<example>
-	<![CDATA[
-	{
-		"commits": [
-			{
-				"message": "feat(scope): concise description of changes in English",
-				"japanese": "変更内容の簡潔な日本語での説明"
-			}
-		]
-	}
-	]]>
-	</example>
-	</section>
-	<section>
-	<instruction>Generate the ${n} best commit message candidates based on the diff, ordered from most to least fitting. Rely mainly on the diff, but also consider the hint if provided. Ensure valid JSON output matching the example format.</instruction>
-	</section>
-	</system>
-	</prompt>
-	`;
+  const systemPrompt = `
+  <prompt>
+  <system>
+  <section>
+  <instruction>Generate ${n} concise git commit message candidates for the given diff, following the specs:</instruction>
+  <language>
+  <item>Write each message in English, with Japanese translation in the "japanese" field</item>
+  <item>Only translate the description, not the type or scope</item>
+  </language>
+  <format>
+  <item>Follow Conventional Commits format</item>
+  <item>English message must be a single line, max ${maxLength} chars</item>
+  <item>Consolidate multiple types/scopes into one if needed</item>
+  <item>Set scope to \`build(deps)\` when bumping dependencies</item>
+  <item>Use \`refactor\` type for trivial code changes without logic impact</item>
+  <item>Omit 'in ...' phrases and file extensions from scope</item>
+  <item>If file is in subdir, only include the subdir name in scope, not full path</item>
+  </format>
+  <content>
+  <item>Describe the result of the changes, not the changes themselves</item>
+  <item>Avoid generic terms like Refactor, Update, Adjust, Improve, etc.</item>
+  </content>
+  <output>
+  <item>Output valid JSON as shown in example</item>
+  <item>Wrap the commits array in a "commits" object</item>
+  </output>
+  <example>
+  <![CDATA[
+    {
+      "commits": [
+        {
+          "message": "feat(scope): concise description of changes in English",
+          "japanese": "変更内容の簡潔な日本語での説明"
+        }
+      ]
+    }
+  ]]>
+  </example>
+  </section>
+  <section>
+  <instruction>Generate the ${n} best commit message candidates based on the diff, ordered from most to least fitting. Rely mainly on the diff, but also consider the hint if provided. Ensure valid JSON output matching the example format.</instruction>
+  </section>
+  </system>
+  </prompt>
+  `;
 
-	const userPrompt = `
-	<prompt>
-	<user>
-	<diff>
-	<![CDATA[
-	${diff}
-	]]>
-	</diff>
-	<hint>
-	<item>If provided, use hint to describe commit, but rely mainly on diff:</item>
-	<item>${hint}</item>
-	</hint>
-	</user>
-	</prompt>
-	`;
+  const userPrompt = `
+  <prompt>
+  <user>
+  <diff>
+  <![CDATA[
+    ${diff}
+  ]]>
+  </diff>
+  <hint>
+  <item>If provided, use hint to describe commit, but rely mainly on diff:</item>
+  <item>${hint}</item>
+  </hint>
+  </user>
+  </prompt>
+  `;
 
-	return { systemPrompt, userPrompt };
+  return { systemPrompt, userPrompt };
 }
 */
 
@@ -168,18 +168,22 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   ` : ''}
 
   <output>
+  - Generate commit message candidates that range from highly relevant to creative, based on the diff and hint
+  - For each candidate, include a "score" field indicating the estimated relevance (0-100, where 100 is most relevant)
+  - Sort the candidates by descending score
   - Output valid JSON as shown in this example:
   {
     "commits": [
       {
         "message": "feat(scope): concise description of changes in English",
-        "japanese": "変更内容の簡潔な日本語での説明"
+        "japanese": "変更内容の簡潔な日本語での説明",
+        "score": 95
       }
     ]
   }
   </output>
 
-  Generate the ${n} most appropriate commit message candidates based mainly on the diff, but also consider the hint if provided. Ensure the JSON output is valid and matches the example format.
+  Generate the most appropriate commit message candidates based mainly on the diff, but also consider the hint if provided. Ensure the JSON output is valid and matches the example format.
 
   ${isNuxtProject ? `
   If there are any contradictions between the <nuxt_considerations> and the rest of the prompt, prioritize the <nuxt_considerations>.
