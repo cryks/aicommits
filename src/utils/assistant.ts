@@ -15,7 +15,7 @@ export type CommitParams = {
 export type GeneratedCommitMessages = {
 	commits: {
 		message: string;
-		japanese: string;
+		japanese?: string;
 		score: number;
 	}[];
 	assistant?: string;
@@ -23,7 +23,7 @@ export type GeneratedCommitMessages = {
 
 export type CommitMessage = {
 	message: string;
-	japanese: string;
+	japanese?: string;
 	score: number;
 };
 

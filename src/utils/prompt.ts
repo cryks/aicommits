@@ -14,8 +14,7 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   Please generate ${n} concise git commit message candidates for the given diff, following these specifications:
 
   <language>
-  - Write each message in English, with a Japanese translation in the "japanese" field
-  - Only translate the description part, not the type or scope
+  - Write each message in English
   </language>
 
   <format>
@@ -71,7 +70,6 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
     "commits": [
       {
         "message": "feat(scope): concise description of changes in English",
-        "japanese": "変更内容の簡潔な日本語での説明",
         "score": 95
       }
     ]
@@ -82,7 +80,6 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
     "commits": [
       {
         "message": "feat(scope): concise description of changes in English",
-        "japanese": "変更内容の簡潔な日本語での説明",
         "score": 95
       }
     ],
