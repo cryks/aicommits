@@ -57,20 +57,12 @@ export default async (
 
 		const gitDir = await getGitDir();
 		const promptTitlePath = path.join(gitDir, "prompt-title");
-		const promptBodyPath = path.join(gitDir, "prompt-body");
 		let promptTitle: string | undefined = undefined;
-		let promptBody: string | undefined = undefined;
 		if (fs.existsSync(promptTitlePath)) {
 			promptTitle = fs.readFileSync(promptTitlePath, "utf-8").trim();
 		}
-		if (fs.existsSync(promptBodyPath)) {
-			promptBody = fs.readFileSync(promptBodyPath, "utf-8").trim();
-		}
 		if (promptTitle) {
 			log.step("📝 Prompt title found");
-		}
-		if (promptBody) {
-			log.step("🔍 Prompt body found");
 		}
 
 		const detectingFiles = spinner();
