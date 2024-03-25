@@ -1,5 +1,4 @@
 import {
-	//confirm,
 	intro,
 	isCancel,
 	log,
@@ -197,49 +196,34 @@ export default async (
 						// prettier-ignore
 						options: [
 							{
-								label: "💬 Add extra context to guide the AI.",
-								value: "*MOREREQ*",
-								hint: "AIを導くための追加のコンテキストを入力します。",
+								label: `🔄 Generate more suggestions`,
+								value: "Generate more commit message suggestions.",
+								hint: "さらにコミットメッセージの提案を生成してください。",
 							},
 							{
-								label: "🤖🔀 Change type",
+								label: `🔀 ${green("Change type")}`,
 								value: "Change the type of the commit message.",
 								hint: "コミットメッセージのタイプを変更してください。",
 							},
 							{
-								label: "🤖🎯 Modify scope",
-								value: "Modify the scope of the commit message.",
-								hint: "コミットメッセージのスコープを修正してください。",
+								label: `🎯 ${green("Change scope")}`,
+								value: "Change the scope of the commit message.",
+								hint: "コミットメッセージのスコープを変更してください。",
 							},
 							{
-								label: "🤖😊 Emphasize the benefits and positive impact in the commit message.",
-								value: "Emphasize the benefits and positive impact in the commit message.",
-								hint: "コミットメッセージで変更の利点とポジティブな影響を強調してください。",
+								label: `🤖 ${cyan("Highlight the benefits and purpose of the changes in the commit messages.")}`,
+								value: "Highlight the benefits and purpose of the changes in the commit messages.",
+								hint: "コミットメッセージで、変更の利点と目的を強調してください。",
 							},
 							{
-								label: "🤖🆕 Generate completely new commit message ideas.",
-								value: "Generate completely new commit message ideas.",
-								hint: "全く新しいコミットメッセージのアイデアを生成してください。",
-							},
-							{
-								label: "🤖📝 Provide more detailed explanations in the commit messages.",
-								value: "Provide more detailed explanations in the commit messages.",
-								hint: "コミットメッセージにより詳細な説明を提供してください。",
-							},
-							{
-								label: "🤖🌿 Take a different approach in generating the commit messages.",
+								label: `🤖 ${cyan("Take a different approach in generating the commit messages.")}`,
 								value: "Take a different approach in generating the commit messages.",
 								hint: "コミットメッセージの生成において、別のアプローチを取ってください。",
 							},
 							{
-								label: "🤖🔍 Explore alternative commit message ideas.",
-								value: "Explore alternative commit message ideas.",
-								hint: "代替のコミットメッセージのアイデアを探ってみてください。",
-							},
-							{
-								label: "🤖🎉 Highlight the benefits and purpose of the changes in the commit messages.",
-								value: "Highlight the benefits and purpose of the changes in the commit messages.",
-								hint: "コミットメッセージで、変更の利点と目的を強調してください。",
+								label: `💬 Add extra context`,
+								value: "*MOREREQ*",
+								hint: "AIを導くための追加のコンテキストを入力します。",
 							},
 						],
 					});
