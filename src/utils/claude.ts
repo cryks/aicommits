@@ -61,6 +61,7 @@ export async function generateCommitMessage(
 		return {
 			rawResponse: content,
 			messages: generated.commits,
+			assistant: generated.assistant,
 		};
 	} catch (ex) {
 		console.dir(content, { depth: null });

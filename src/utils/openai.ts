@@ -73,6 +73,7 @@ export async function generateCommitMessage(
 		return {
 			rawResponse: contents[0],
 			messages: generated.flatMap((x) => x.commits),
+			assistant: generated[0].assistant,
 		};
 	} catch (ex) {
 		console.dir(contents, { depth: null });

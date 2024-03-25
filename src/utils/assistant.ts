@@ -19,6 +19,7 @@ export type GeneratedCommitMessages = {
 		japanese: string;
 		score: number;
 	}[];
+	assistant?: string;
 };
 
 export type CommitMessage = {
@@ -30,4 +31,5 @@ export type CommitMessage = {
 export type AssistantResponse = {
 	rawResponse: string;
 	messages: CommitMessage[];
+	assistant?: string;
 };

@@ -9,7 +9,7 @@ import {
 	text,
 } from "@clack/prompts";
 import { execa } from "execa";
-import { bgCyan, black, dim, green, red } from "kolorist";
+import { bgCyan, black, cyan, dim, green, red } from "kolorist";
 import fs from "node:fs";
 import path from "node:path";
 import type { AssistantResponse, Model } from "../utils/assistant.js";
@@ -161,6 +161,10 @@ export default async (
 					});
 				} finally {
 					s.stop("Analysis complete");
+				}
+
+				if (response.assistant) {
+					log.step(`${cyan("🤖 AI Assistant:")}\n${response.assistant}`);
 				}
 
 				const selected = await select({
