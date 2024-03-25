@@ -102,9 +102,9 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   `;
 
   const userPrompt = `
-  <diff>
+  <unified_diff>
   ${diff}
-  </diff>
+  </unified_diff>
 
   <hint>
   If provided, use the hint to describe the commit, but rely mainly on the diff:
