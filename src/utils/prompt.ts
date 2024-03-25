@@ -142,18 +142,24 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   - Avoid generic terms like Refactor, Update, Adjust, Improve, etc.
   </content>
 
-	${isNuxtProject ? `
-	<nuxt_considerations>
-	- Use \`nuxt\` as the scope for Nuxt-specific changes (e.g., nuxt.config, plugins, modules)
-	- Use \`pages\` as the scope for changes to pages/ directory
-	- Use \`components\` as the scope for changes to components/ directory
-	- Use \`store\` as the scope for changes related to Vuex store
-	- Use \`i18n\` as the scope for internationalization related changes
-	- Use \`ssr\` as the scope for server-side rendering specific changes
-	- Prefer more specific scopes like \`nuxt(config)\`, \`nuxt(plugin)\`, \`nuxt(module)\` when applicable
-	- Mention the specific page, component, or feature in the description when relevant
-	</nuxt_considerations>
-	` : ''}
+  ${isNuxtProject ? `
+  <nuxt_considerations>
+  - Use \`nuxt\` as the scope for general Nuxt-specific changes
+  - Use \`config\`, \`plugin\`, \`module\` as the scope for changes to nuxt.config, plugins, and modules respectively
+  - Use \`pages\` as the scope for changes to pages/ directory
+  - Use \`components\` as the scope for changes to components/ directory
+  - Use \`composables\` as the scope for changes to composables/ directory
+  - Use \`server\` as the scope for changes to server/ directory and server-side API components
+  - Use \`store\` as the scope for changes related to Vuex store
+  - Use \`i18n\` as the scope for internationalization related changes
+  - Use \`ssr\` as the scope for server-side rendering specific changes
+  - Use \`assets\` as the scope for changes to assets/ directory (e.g., images, fonts, css)
+  - Use \`layouts\` as the scope for changes to layouts/ directory
+  - Use \`middleware\` as the scope for changes to middleware/ directory
+  - Use \`public\` as the scope for changes to public/ directory (e.g., favicon, robots.txt)
+  - Mention the specific page, component, API endpoint, or feature in the description when relevant
+  </nuxt_considerations>
+  ` : ''}
 
   ${additionalPrompt ? `
   <additional_prompt>
@@ -175,9 +181,9 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
 
   Generate the ${n} most appropriate commit message candidates based mainly on the diff, but also consider the hint if provided. Ensure the JSON output is valid and matches the example format.
 
-	${isNuxtProject ? `
-	If there are any contradictions between the <nuxt_considerations> and the rest of the prompt, prioritize the <nuxt_considerations>.
-	` : ''}
+  ${isNuxtProject ? `
+  If there are any contradictions between the <nuxt_considerations> and the rest of the prompt, prioritize the <nuxt_considerations>.
+  ` : ''}
 
   ${additionalPrompt ? `
   If there are any contradictions between the <additional_prompt> and the base prompt, prioritize the <additional_prompt>.
