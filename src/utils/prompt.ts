@@ -30,7 +30,7 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
 
   <content>
   - Describe the result of the changes, not the changes themselves
-  - Avoid generic terms like Refactor, Update, Adjust, Improve, etc.
+  - Avoid generic terms like Refactor, Update, Adjust, Improve, Streamline, Consolidate, Simplify, etc.
   </content>
 
   ${isNuxtProject ? `
