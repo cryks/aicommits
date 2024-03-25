@@ -181,11 +181,6 @@ export default async (
 								value: value.message,
 							};
 						}),
-						{
-							label: "💬 Add More Context",
-							hint: "",
-							value: "*MOREREQ*",
-						},
 					],
 				});
 
@@ -193,18 +188,79 @@ export default async (
 					outro("Commit aborted");
 					return;
 				}
+
 				if (selected === "*REGENERATE*") {
-					continue;
-				} else if (selected === "*MOREREQ*") {
-					const input = await text({
-						message: "Enter extra context to guide the AI:",
+					const c = await select({
+						message:
+							"Select a prompt to guide the AI in generating new commit message suggestions:",
+						initialValue: "",
+						// prettier-ignore
+						options: [
+							{
+								label: "💬 Add extra context to guide the AI.",
+								value: "*MOREREQ*",
+								hint: "AIを導くための追加のコンテキストを入力します。",
+							},
+							{
+								label: "🤖🔀 Change type",
+								value: "Change the type of the commit message.",
+								hint: "コミットメッセージのタイプを変更してください。",
+							},
+							{
+								label: "🤖🎯 Modify scope",
+								value: "Modify the scope of the commit message.",
+								hint: "コミットメッセージのスコープを修正してください。",
+							},
+							{
+								label: "🤖😊 Emphasize the benefits and positive impact in the commit message.",
+								value: "Emphasize the benefits and positive impact in the commit message.",
+								hint: "コミットメッセージで変更の利点とポジティブな影響を強調してください。",
+							},
+							{
+								label: "🤖🆕 Generate completely new commit message ideas.",
+								value: "Generate completely new commit message ideas.",
+								hint: "全く新しいコミットメッセージのアイデアを生成してください。",
+							},
+							{
+								label: "🤖📝 Provide more detailed explanations in the commit messages.",
+								value: "Provide more detailed explanations in the commit messages.",
+								hint: "コミットメッセージにより詳細な説明を提供してください。",
+							},
+							{
+								label: "🤖🌿 Take a different approach in generating the commit messages.",
+								value: "Take a different approach in generating the commit messages.",
+								hint: "コミットメッセージの生成において、別のアプローチを取ってください。",
+							},
+							{
+								label: "🤖🔍 Explore alternative commit message ideas.",
+								value: "Explore alternative commit message ideas.",
+								hint: "代替のコミットメッセージのアイデアを探ってみてください。",
+							},
+							{
+								label: "🤖🎉 Highlight the benefits and purpose of the changes in the commit messages.",
+								value: "Highlight the benefits and purpose of the changes in the commit messages.",
+								hint: "コミットメッセージで、変更の利点と目的を強調してください。",
+							},
+						],
 					});
-					if (isCancel(input) || !input) {
+
+					if (isCancel(c)) {
 						outro("Commit aborted");
 						return;
 					}
 
-					chats.push({ assistant: response.rawResponse, prompt: input });
+					if (c === "*MOREREQ*") {
+						const input = await text({
+							message: "Enter extra context to guide the AI:",
+						});
+						if (isCancel(input) || !input) {
+							outro("Commit aborted");
+							return;
+						}
+						chats.push({ assistant: response.rawResponse, prompt: input });
+					} else {
+						chats.push({ assistant: response.rawResponse, prompt: c });
+					}
 					continue;
 				}
 
