@@ -123,7 +123,7 @@ export default async (
 			],
 		});
 		if (isCancel(aiModel)) {
-			outro("Commit cancelled");
+			outro("Commit aborted");
 			return;
 		}
 
@@ -132,10 +132,10 @@ export default async (
 
 		let hint: string | undefined = undefined;
 		const i = await text({
-			message: "Enter a hint to help the AI generate a commit message:",
+			message: "Provide a hint to assist the AI (optional):",
 		});
 		if (isCancel(i)) {
-			outro("Commit cancelled");
+			outro("Commit aborted");
 			return;
 		}
 		if (i) hint = i;
@@ -146,7 +146,7 @@ export default async (
 			// eslint-disable-next-line no-constant-condition
 			while (true) {
 				const s = spinner();
-				s.start("The AI is analyzing your changes");
+				s.start("AI is analyzing your changes...");
 				let response: AssistantResponse;
 				try {
 					response = await generateCommitMessage(aiModel.model, {
@@ -160,7 +160,7 @@ export default async (
 						...inferredProjectType,
 					});
 				} finally {
-					s.stop("Changes analyzed");
+					s.stop("Analysis complete");
 				}
 
 				const selected = await select({
@@ -169,7 +169,7 @@ export default async (
 					message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
 					options: [
 						{
-							label: "🔃 Regenerate",
+							label: "🔄 Generate New Suggestions",
 							hint: "",
 							value: "*REGENERATE*",
 						},
@@ -183,7 +183,7 @@ export default async (
 							};
 						}),
 						{
-							label: "🔃 More Request",
+							label: "💬 Add More Context",
 							hint: "",
 							value: "*MOREREQ*",
 						},
@@ -191,17 +191,17 @@ export default async (
 				});
 
 				if (isCancel(selected)) {
-					outro("Commit cancelled");
+					outro("Commit aborted");
 					return;
 				}
 				if (selected === "*REGENERATE*") {
 					continue;
 				} else if (selected === "*MOREREQ*") {
 					const input = await text({
-						message: "Additional requests to the assistant:",
+						message: "Enter extra context to guide the AI:",
 					});
 					if (isCancel(input) || !input) {
-						outro("Commit cancelled");
+						outro("Commit aborted");
 						return;
 					}
 
@@ -218,11 +218,11 @@ export default async (
 
 		{
 			const input = await text({
-				message: "Enter a commit message:",
+				message: "Enter the desired commit message:",
 				initialValue: message,
 			});
 			if (isCancel(input)) {
-				outro("Commit cancelled");
+				outro("Commit aborted");
 				return;
 			}
 			message = input;
@@ -230,7 +230,7 @@ export default async (
 
 		await execa("git", ["commit", "-m", message, ...rawArgv]);
 
-		outro(`${green("✔")} Successfully committed!`);
+		outro(`${green("✔")} Commit successful!`);
 	})().catch((error) => {
 		outro(`${red("✖")} ${error.message}`);
 		handleCliError(error);
