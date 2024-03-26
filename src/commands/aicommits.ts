@@ -6,6 +6,7 @@ import {
 	select,
 	spinner,
 	text,
+	multiselect,
 } from "@clack/prompts";
 import { execa } from "execa";
 import { bgCyan, black, cyan, dim, green, red } from "kolorist";
@@ -193,16 +194,12 @@ export default async (
 				}
 
 				if (selected === "*REGENERATE*") {
-					const c = await select({
+					const c = await multiselect({
 						message:
 							"Select a prompt to guide the AI in generating new commit message suggestions:",
-						initialValue: "",
+						initialValues: [] as string[],
 						// prettier-ignore
 						options: [
-							{
-								label: `⏪`,
-								value: "*BACK*",
-							},
 							{
 								label: `🔄 Generate more suggestions`,
 								value: "Generate more commit message suggestions.",
@@ -229,19 +226,34 @@ export default async (
 								hint: "コミットメッセージのタイプを 'docs:' に変更してください。",
 							},
 							{
+								label: `🔧 ${green("Change type to 'chore:'")}`,
+								value: "Change the type of the commit message to 'chore:'.",
+								hint: "コミットメッセージのタイプを 'chore:' に変更してください。",
+							},
+							{
 								label: `🎯 ${green("Change scope")}`,
 								value: "Change the scope of the commit message.",
 								hint: "コミットメッセージのスコープを変更してください。",
 							},
 							{
+								label: `🚫 ${red("Remove scope")}`,
+								value: "Remove the scope from the commit message.",
+								hint: "コミットメッセージからスコープを削除してください。",
+							},
+							{
+								label: `🤖 ${red("Remove 'in/on <filename>' expressions from the commit message.")}`,
+								value: "Remove 'in/on <filename>' expressions from the commit message.",
+								hint: "コミットメッセージから 'in/on <ファイル名>' という表現を削除してください。",
+							},
+							{
+								label: `🤖 ${cyan("Replace vague expressions like 'better readability' with more specific descriptions.")}`,
+								value: "Replace vague expressions like 'better readability' with more specific descriptions.",
+								hint: "'better readability' のようなあいまいな表現を、より具体的な説明に置き換えてください。",
+							},
+							{
 								label: `🤖 ${cyan("Highlight the benefits and purpose of the changes in the commit messages.")}`,
 								value: "Highlight the benefits and purpose of the changes in the commit messages.",
 								hint: "コミットメッセージで、変更の利点と目的を強調してください。",
-							},
-							{
-								label: `🤖 ${cyan("Take a different approach in generating the commit messages.")}`,
-								value: "Take a different approach in generating the commit messages.",
-								hint: "コミットメッセージの生成において、別のアプローチを取ってください。",
 							},
 							{
 								label: `🤖 ${cyan("English please.")}`,
@@ -256,23 +268,26 @@ export default async (
 						],
 					});
 
-					if (isCancel(c) || c === "*BACK*") {
+					if (isCancel(c)) {
 						generate = false;
 						continue;
 					}
 
-					if (c === "*MOREREQ*") {
+					const reqIndex = c.findIndex((x) => x === "*MOREREQ*");
+					if (reqIndex !== -1) {
 						const input = await text({
 							message: "Enter extra context to guide the AI:",
 						});
 						if (isCancel(input) || !input) {
-							outro("Commit aborted");
-							return;
+							generate = false;
+							continue;
 						}
-						chats.push({ assistant: response.rawResponse, prompt: input });
-					} else {
-						chats.push({ assistant: response.rawResponse, prompt: c });
+						c[reqIndex] = input;
 					}
+					chats.push({
+						assistant: response.rawResponse,
+						prompt: c.join("\n\n"),
+					});
 					continue;
 				}
 
