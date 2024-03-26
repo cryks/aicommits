@@ -126,27 +126,35 @@ export default async (
 		const chats: Chat[] = [];
 
 		const choose = async () => {
+			let generate = true;
+			let response: AssistantResponse | undefined = undefined;
 			// eslint-disable-next-line no-constant-condition
 			while (true) {
-				const s = spinner();
-				s.start("AI is analyzing your changes...");
-				let response: AssistantResponse;
-				try {
-					response = await generateCommitMessage(aiModel.model, {
-						maxLength: config["max-length"],
-						diff: staged.diff,
-						hint,
-						additionalPrompt: promptTitle,
-						chats,
-						n: config.generate,
-						...inferredProjectType,
-					});
-				} finally {
-					s.stop("Analysis complete");
+				if (generate) {
+					const s = spinner();
+					s.start("AI is analyzing your changes...");
+					try {
+						response = await generateCommitMessage(aiModel.model, {
+							maxLength: config["max-length"],
+							diff: staged.diff,
+							hint,
+							additionalPrompt: promptTitle,
+							chats,
+							n: config.generate,
+							...inferredProjectType,
+						});
+					} finally {
+						s.stop("Analysis complete");
+					}
+					if (response.assistant) {
+						log.step(`${cyan("🤖 AI Assistant:")}\n${response.assistant}`);
+					}
+				} else {
+					generate = true;
 				}
 
-				if (response.assistant) {
-					log.step(`${cyan("🤖 AI Assistant:")}\n${response.assistant}`);
+				if (!response) {
+					throw new KnownError("No response from the AI model");
 				}
 
 				const selected = await select({
@@ -183,6 +191,10 @@ export default async (
 						initialValue: "",
 						// prettier-ignore
 						options: [
+							{
+								label: `⏪`,
+								value: "*BACK*",
+							},
 							{
 								label: `🔄 Generate more suggestions`,
 								value: "Generate more commit message suggestions.",
@@ -236,9 +248,9 @@ export default async (
 						],
 					});
 
-					if (isCancel(c)) {
-						outro("Commit aborted");
-						return;
+					if (isCancel(c) || c === "*BACK*") {
+						generate = false;
+						continue;
 					}
 
 					if (c === "*MOREREQ*") {
