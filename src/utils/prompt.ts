@@ -4,11 +4,12 @@ type PromptConfig = {
 	n: number;
 	additionalPrompt?: string;
 	isNuxtProject?: boolean;
+	isGoProject?: boolean;
 };
 
 // prettier-ignore
 export function generatePromptJSON(diff: string, config: PromptConfig) {
-  const { maxLength, hint, n, additionalPrompt, isNuxtProject } = config;
+  const { maxLength, hint, n, additionalPrompt, isNuxtProject, isGoProject } = config;
 
   const systemPrompt = `
   Please generate ${n} concise git commit message candidates for the given diff, following these specifications:
@@ -48,6 +49,20 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   - Use \`public\` as the scope for changes to public/ directory (e.g., favicon, robots.txt)
   - Mention the specific page, component, API endpoint, or feature in the description when relevant
   </nuxt_considerations>
+  ` : ''}
+
+  ${isGoProject ? `
+  <go_considerations>
+  - Use \`go\` as the scope for general Go-specific changes
+  - Use \`build\` as the scope for changes related to the build process, Makefile, etc.
+  - Use \`deps\` as the scope when updating dependencies (e.g., go.mod, go.sum)
+  - Use \`config\` as the scope for configuration-related changes
+  - Use \`cmd\` as the scope for changes to the cmd/ directory (main package)
+  - Use \`pkg\` as the scope for changes to the pkg/ directory (library packages)
+  - Use \`test\` as the scope for changes to tests
+  - Use \`docs\` as the scope for changes to documentation
+  - Mention the specific package, function, or feature in the description when relevant
+  </go_considerations>
   ` : ''}
 
   ${additionalPrompt ? `
@@ -92,6 +107,10 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
 
   ${isNuxtProject ? `
   If there are any contradictions between the <nuxt_considerations> and the rest of the prompt, prioritize the <nuxt_considerations>.
+  ` : ''}
+
+  ${isGoProject ? `
+  If there are any contradictions between the <go_considerations> and the rest of the prompt, prioritize the <go_considerations>.
   ` : ''}
 
   ${additionalPrompt ? `

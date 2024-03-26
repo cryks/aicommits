@@ -36,8 +36,13 @@ async function inferProjectType() {
 		fs.existsSync(path.join(gitDir, file))
 	);
 
+	const isGoProject = ["go.mod", "go.sum"].every((file) =>
+		fs.existsSync(path.join(gitDir, file))
+	);
+
 	return {
 		isNuxtProject,
+		isGoProject,
 	};
 }
 
@@ -53,6 +58,9 @@ export default async (
 		const inferredProjectType = await inferProjectType();
 		if (inferredProjectType.isNuxtProject) {
 			log.step("🚀 Nuxt.js project");
+		}
+		if (inferredProjectType.isGoProject) {
+			log.step("🐹 Go project");
 		}
 
 		const gitDir = await getGitDir();
