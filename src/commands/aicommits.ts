@@ -189,9 +189,24 @@ export default async (
 								hint: "さらにコミットメッセージの提案を生成してください。",
 							},
 							{
-								label: `🔀 ${green("Change type")}`,
-								value: "Change the type of the commit message.",
-								hint: "コミットメッセージのタイプを変更してください。",
+								label: `🌟 ${green("Change type to 'feat:'")}`,
+								value: "Change the type of the commit message to 'feat:'.",
+								hint: "コミットメッセージのタイプを 'feat:' に変更してください。",
+							},
+							{
+								label: `🐛 ${green("Change type to 'fix:'")}`,
+								value: "Change the type of the commit message to 'fix:'.",
+								hint: "コミットメッセージのタイプを 'fix:' に変更してください。",
+							},
+							{
+								label: `💅 ${green("Change type to 'style:'")}`,
+								value: "Change the type of the commit message to 'style:'.",
+								hint: "コミットメッセージのタイプを 'style:' に変更してください。",
+							},
+							{
+								label: `📚 ${green("Change type to 'docs:'")}`,
+								value: "Change the type of the commit message to 'docs:'.",
+								hint: "コミットメッセージのタイプを 'docs:' に変更してください。",
 							},
 							{
 								label: `🎯 ${green("Change scope")}`,
@@ -207,6 +222,11 @@ export default async (
 								label: `🤖 ${cyan("Take a different approach in generating the commit messages.")}`,
 								value: "Take a different approach in generating the commit messages.",
 								hint: "コミットメッセージの生成において、別のアプローチを取ってください。",
+							},
+							{
+								label: `🤖 ${cyan("English please.")}`,
+								value: "English please.",
+								hint: "英語にしてください。",
 							},
 							{
 								label: `💬 Add extra context`,
