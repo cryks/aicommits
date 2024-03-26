@@ -155,7 +155,7 @@ export default async (
 					message: `Pick a commit message to use: ${dim("(Ctrl+c to exit)")}`,
 					options: [
 						{
-							label: "🔄 Generate New Suggestions",
+							label: "🔄 Generate new suggestions",
 							hint: "",
 							value: "*REGENERATE*",
 						},
