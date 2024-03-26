@@ -20,6 +20,7 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   <format>
   - Follow the Conventional Commits format
   - English message should be a single line, max ${maxLength} characters
+  - Start the description with a lowercase letter
   - Consolidate multiple types/scopes into one if needed
   - Set scope to \`build(deps)\` when bumping dependencies
   - Use \`refactor\` type for trivial code changes without logic impact
