@@ -2,11 +2,11 @@ import {
 	intro,
 	isCancel,
 	log,
+	multiselect,
 	outro,
 	select,
 	spinner,
 	text,
-	multiselect,
 } from "@clack/prompts";
 import { execa } from "execa";
 import { bgCyan, black, cyan, dim, green, red } from "kolorist";
@@ -25,8 +25,9 @@ import {
 	getStagedDiff,
 } from "../utils/git.js";
 import { generateCommitMessage as useOpenAI } from "../utils/openai.js";
+import { generateCommitMessage as useLocal } from "../utils/ollama.js";
 
-type AIVendor = "anthropic" | "openai";
+type AIVendor = "anthropic" | "openai" | "local";
 type AIModel = Model;
 type AIModelVendor = { vendor: AIVendor } & { model: AIModel };
 
@@ -94,15 +95,23 @@ export default async (
 
 		const aiModel = await select({
 			message: "Choose an AI model to use:",
-			initialValue: { vendor: "anthropic", model: "high" } as AIModelVendor,
+			initialValue: { vendor: "openai", model: "high" } as AIModelVendor,
 			options: [
-				{
-					label: "Claude 3 Opus",
-					value: { vendor: "anthropic", model: "high" },
-				},
 				{
 					label: "GPT-4 Turbo",
 					value: { vendor: "openai", model: "high" },
+				},
+				{
+					label: "llama3:70b",
+					value: { vendor: "local", model: "high" },
+				},
+				{
+					label: "llama3:8b",
+					value: { vendor: "local", model: "middle" },
+				},
+				{
+					label: "Claude 3 Opus",
+					value: { vendor: "anthropic", model: "high" },
 				},
 				{
 					label: "Claude 3 Sonnet",
@@ -120,7 +129,11 @@ export default async (
 		}
 
 		const generateCommitMessage =
-			aiModel.vendor === "anthropic" ? useAnthropic : useOpenAI;
+			aiModel.vendor === "anthropic"
+				? useAnthropic
+				: aiModel.vendor === "openai"
+				? useOpenAI
+				: useLocal;
 
 		let hint: string | undefined = undefined;
 		const i = await text({
@@ -254,11 +267,6 @@ export default async (
 								label: `🤖 ${cyan("Highlight the benefits and purpose of the changes in the commit messages.")}`,
 								value: "Highlight the benefits and purpose of the changes in the commit messages.",
 								hint: "コミットメッセージで、変更の利点と目的を強調してください。",
-							},
-							{
-								label: `🤖 ${cyan("English please.")}`,
-								value: "English please.",
-								hint: "英語にしてください。",
 							},
 							{
 								label: `💬 Add extra context`,
