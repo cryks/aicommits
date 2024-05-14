@@ -98,7 +98,7 @@ export default async (
 			initialValue: { vendor: "openai", model: "high" } as AIModelVendor,
 			options: [
 				{
-					label: "GPT-4 Turbo",
+					label: "GPT-4o",
 					value: { vendor: "openai", model: "high" },
 				},
 				{

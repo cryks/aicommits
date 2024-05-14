@@ -49,9 +49,9 @@ export async function generateCommitMessage(
 	const msg = await openai.chat.completions.create({
 		model:
 			model === "high"
-				? "gpt-4-turbo-preview"
+				? "gpt-4o"
 				: model === "middle"
-				? "gpt-4"
+				? "gpt-4-turbo"
 				: "gpt-3.5-turbo",
 		messages,
 		//n: commit.n,
