@@ -102,6 +102,14 @@ export default async (
 					value: { vendor: "openai", model: "high" },
 				},
 				{
+					label: "o1-preview",
+					value: { vendor: "openai", model: "middle" },
+				},
+				{
+					label: "o1-mini",
+					value: { vendor: "openai", model: "low" },
+				},
+				{
 					label: "llama3:70b",
 					value: { vendor: "local", model: "high" },
 				},

@@ -9,7 +9,7 @@ type PromptConfig = {
 
 // prettier-ignore
 export function generatePromptJSON(diff: string, config: PromptConfig) {
-  const { maxLength, hint, n, additionalPrompt, isNuxtProject, isGoProject } = config;
+  const { maxLength, hint, n, additionalPrompt, isNuxtProject } = config;
 
   const systemPrompt = `
   Please generate ${n} concise git commit message candidates for the given diff, following these specifications:
@@ -36,33 +36,9 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
 
   ${isNuxtProject ? `
   <nuxt_considerations>
-  - Use \`nuxt\` as the scope for general Nuxt-specific changes
-  - Use \`config\`, \`plugin\`, \`module\` as the scope for changes to nuxt.config, plugins, and modules respectively
-  - Use \`pages\` as the scope for changes to pages/ directory
-  - Use \`components\` as the scope for changes to components/ directory
-  - Use \`composables\` as the scope for changes to composables/ directory
-  - Use \`server\` as the scope for changes to server/ directory and server-side API components
-  - Use \`store\` as the scope for changes related to Vuex store
-  - Use \`assets\` as the scope for changes to assets/ directory (e.g., images, fonts, css)
-  - Use \`layouts\` as the scope for changes to layouts/ directory
-  - Use \`middleware\` as the scope for changes to middleware/ directory
-  - Use \`public\` as the scope for changes to public/ directory (e.g., favicon, robots.txt)
-  - Mention the specific page, component, API endpoint, or feature in the description when relevant
+  - For changes related to the Nuxt project (excluding changes to .github/, Dockerfile, etc.):
+    - Use one of these scopes: \`nuxt\`, \`config\`, \`plugin\`, \`module\`, \`pages\`, \`components\`, \`composables\`, \`server\`, \`store\`, \`assets\`, \`layouts\`, \`middleware\`, \`public\`
   </nuxt_considerations>
-  ` : ''}
-
-  ${isGoProject ? `
-  <go_considerations>
-  - Use \`go\` as the scope for general Go-specific changes
-  - Use \`build\` as the scope for changes related to the build process, Makefile, etc.
-  - Use \`deps\` as the scope when updating dependencies (e.g., go.mod, go.sum)
-  - Use \`config\` as the scope for configuration-related changes
-  - Use \`cmd\` as the scope for changes to the cmd/ directory (main package)
-  - Use \`pkg\` as the scope for changes to the pkg/ directory (library packages)
-  - Use \`test\` as the scope for changes to tests
-  - Use \`docs\` as the scope for changes to documentation
-  - Mention the specific package, function, or feature in the description when relevant
-  </go_considerations>
   ` : ''}
 
   ${additionalPrompt ? `
@@ -107,10 +83,6 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
 
   ${isNuxtProject ? `
   If there are any contradictions between the <nuxt_considerations> and the rest of the prompt, prioritize the <nuxt_considerations>.
-  ` : ''}
-
-  ${isGoProject ? `
-  If there are any contradictions between the <go_considerations> and the rest of the prompt, prioritize the <go_considerations>.
   ` : ''}
 
   ${additionalPrompt ? `

@@ -15,13 +15,16 @@ export async function generateCommitMessage(
 	model: Model,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
+	const openaiModel = model === "high" ? "gpt-4o" : model === "middle" ? "o1-preview" : "o1-mini";
+	const systemRole = openaiModel !== "gpt-4o" ? "user" : "system";
+
 	const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 	const leading = "{";
 
 	const prompt = generatePromptJSON(commit.diff, commit);
 
 	messages.push({
-		role: "system",
+		role: systemRole,
 		content: prompt.systemPrompt,
 	});
 
@@ -47,19 +50,17 @@ export async function generateCommitMessage(
 	});
 
 	const msg = await openai.chat.completions.create({
-		model:
-			model === "high"
-				? "gpt-4o"
-				: model === "middle"
-				? "gpt-4-turbo"
-				: "gpt-3.5-turbo",
+		model: openaiModel,
 		messages,
 		//n: commit.n,
-		max_tokens: 1000,
-		temperature: 0,
-		response_format: {
-			type: "json_object",
-		},
+		...(openaiModel !== "gpt-4o" ? {
+		} : {
+			max_tokens: 1000,
+			temperature: 0,
+			response_format: {
+				type: "json_object",
+			},
+		}),
 	});
 
 	const contents = msg.choices
