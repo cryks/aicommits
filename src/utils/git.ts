@@ -70,6 +70,16 @@ export const getStagedDiff = async (excludeFiles?: string[]) => {
 	};
 };
 
+export const getGitLog = async () => {
+	const { stdout } = await execa("git", [
+		"log",
+		"--oneline",
+		"-n",
+		"100",
+	]);
+	return stdout;
+}
+
 export const getDetectedMessage = (files: string[]) =>
 	`Detected ${files.length.toLocaleString()} staged file${
 		files.length > 1 ? "s" : ""

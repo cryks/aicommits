@@ -23,6 +23,7 @@ import {
 	getGitDir,
 	getGitTopDir,
 	getStagedDiff,
+	getGitLog,
 } from "../utils/git.js";
 import { generateCommitMessage as useOpenAI } from "../utils/openai.js";
 import { generateCommitMessage as useLocal } from "../utils/ollama.js";
@@ -82,6 +83,8 @@ export default async (
 				"No staged changes found. Stage your changes manually, or automatically stage all changes with the `--all` flag."
 			);
 		}
+
+		const gitLog = await getGitLog();
 
 		log.step(
 			`${getDetectedMessage(staged.files)}:\n${staged.files
@@ -168,6 +171,7 @@ export default async (
 							maxLength: config["max-length"],
 							diff: staged.diff,
 							hint,
+							gitLog,
 							additionalPrompt: promptTitle,
 							chats,
 							n: config.generate,

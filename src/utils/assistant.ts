@@ -6,6 +6,7 @@ export type CommitParams = {
 	maxLength: number;
 	diff: string;
 	hint?: string;
+  gitLog?: string;
 	additionalPrompt?: string;
 	chats: Chat[];
 	n: number;

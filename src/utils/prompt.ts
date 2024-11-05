@@ -1,6 +1,7 @@
 type PromptConfig = {
 	maxLength: number;
 	hint?: string;
+  gitLog?: string;
 	n: number;
 	additionalPrompt?: string;
 	isNuxtProject?: boolean;
@@ -90,10 +91,27 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   ` : ''}
   `;
 
+  const gitLog = config.gitLog ?
+`
+Please use the provided \`git log\` information as context to generate commit message candidates that align with the project’s history. Focus on consistency in tone, style, and scope based on previous commits, especially when:
+
+	1.	Similar types of changes have been made in the past.
+	2.	There are common themes or scopes that the log reveals as relevant.
+
+Refer to past commit messages to ensure stylistic coherence, prioritizing any recurring terms or conventions found in the git log section. However, the description should still accurately reflect the changes shown in the unified diff, prioritizing the latest context from the diff over past messages unless they directly relate.
+
+<git_log>
+${config.gitLog}
+</git_log>
+`
+  : '';
+
   const userPrompt = `
   <unified_diff>
   ${diff}
   </unified_diff>
+
+  ${gitLog}
 
   <hint>
   If provided, use the hint to describe the commit, but rely mainly on the diff:
