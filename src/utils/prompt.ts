@@ -106,6 +106,14 @@ ${config.gitLog}
 `
   : '';
 
+  const hintPrompt = hint ?
+`
+<hint>
+If provided, use the hint to describe the commit, but rely mainly on the diff:
+${hint}
+</hint>
+` : '';
+
   const userPrompt = `
   <unified_diff>
   ${diff}
@@ -113,10 +121,7 @@ ${config.gitLog}
 
   ${gitLog}
 
-  <hint>
-  If provided, use the hint to describe the commit, but rely mainly on the diff:
-  ${hint}
-  </hint>
+  ${hintPrompt}
   `;
 
   return { systemPrompt, userPrompt };
