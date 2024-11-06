@@ -73,9 +73,9 @@ export const getStagedDiff = async (excludeFiles?: string[]) => {
 export const getGitLog = async () => {
 	const { stdout } = await execa("git", [
 		"log",
-		"--oneline",
+		"--stat",
 		"-n",
-		"100",
+		"30",
 	]);
 	return stdout;
 }

@@ -93,12 +93,23 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
 
   const gitLog = config.gitLog ?
 `
-Please use the provided \`git log\` information as context to generate commit message candidates that align with the project’s history. Focus on consistency in tone, style, and scope based on previous commits, especially when:
+Please use the provided \`git log\` information as context to generate commit message candidates that align with the project's history. Pay particular attention to the following cases for consistency with past commits:
 
-	1.	Similar types of changes have been made in the past.
-	2.	There are common themes or scopes that the log reveals as relevant.
+1. When similar changes have been made in the past.
+2. When common themes or scopes are evident from the \`git log\`.
 
-Refer to past commit messages to ensure stylistic coherence, prioritizing any recurring terms or conventions found in the git log section. However, the description should still accurately reflect the changes shown in the unified diff, prioritizing the latest context from the diff over past messages unless they directly relate.
+Refer to past commit messages to ensure coherence in style and tone, prioritizing any recurring terms or conventions found in the \`git log\` section. However, the latest context in the unified diff should take precedence over previous messages unless directly relevant.
+
+The \`git log\` information is ordered in descending order (most recent commits at the top) and formatted as follows:
+
+\`\`\`plaintext
+<git_log>
+\`git log --stat\` results here
+...
+</git_log>
+\`\`\`
+
+Additionally, if scopes are not defined in recent commits, exclude scopes from the generated commit messages as well.
 
 <git_log>
 ${config.gitLog}
