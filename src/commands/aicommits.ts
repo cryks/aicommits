@@ -98,8 +98,12 @@ export default async (
 
 		const aiModel = await select({
 			message: "Choose an AI model to use:",
-			initialValue: { vendor: "openai", model: "high" } as AIModelVendor,
+			initialValue: { vendor: "anthropic", model: "high" } as AIModelVendor,
 			options: [
+				{
+					label: "Claude 3.5 Sonnet",
+					value: { vendor: "anthropic", model: "high" },
+				},
 				{
 					label: "GPT-4o",
 					value: { vendor: "openai", model: "high" },
@@ -119,10 +123,6 @@ export default async (
 				{
 					label: "llama3:8b",
 					value: { vendor: "local", model: "middle" },
-				},
-				{
-					label: "Claude 3.5 Sonnet",
-					value: { vendor: "anthropic", model: "high" },
 				},
 				{
 					label: "Claude 3 Opus",
