@@ -121,15 +121,15 @@ export default async (
 					value: { vendor: "local", model: "middle" },
 				},
 				{
-					label: "Claude 3 Opus",
+					label: "Claude 3.5 Sonnet",
 					value: { vendor: "anthropic", model: "high" },
 				},
 				{
-					label: "Claude 3 Sonnet",
+					label: "Claude 3 Opus",
 					value: { vendor: "anthropic", model: "middle" },
 				},
 				{
-					label: "Claude 3 Haiku",
+					label: "Claude 3.5 Haiku",
 					value: { vendor: "anthropic", model: "low" },
 				},
 			],
