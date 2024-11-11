@@ -56,7 +56,7 @@ export async function generateCommitMessage(
 		...(openaiModel !== "gpt-4o" ? {
 		} : {
 			max_tokens: 1000,
-			temperature: 0,
+			temperature: 1,
 			response_format: {
 				type: "json_object",
 			},
