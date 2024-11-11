@@ -17,18 +17,19 @@ import { Chat } from "../utils/chat.js";
 import { generateCommitMessage as useAnthropic } from "../utils/claude.js";
 import { getConfig } from "../utils/config.js";
 import { KnownError, handleCliError } from "../utils/error.js";
+import { generateCommitMessage as useGemini } from "../utils/gemini.js";
 import {
 	assertGitRepo,
 	getDetectedMessage,
 	getGitDir,
+	getGitLog,
 	getGitTopDir,
 	getStagedDiff,
-	getGitLog,
 } from "../utils/git.js";
-import { generateCommitMessage as useOpenAI } from "../utils/openai.js";
 import { generateCommitMessage as useLocal } from "../utils/ollama.js";
+import { generateCommitMessage as useOpenAI } from "../utils/openai.js";
 
-type AIVendor = "anthropic" | "openai" | "local";
+type AIVendor = "anthropic" | "openai" | "gemini" | "local";
 type AIModel = Model;
 type AIModelVendor = { vendor: AIVendor } & { model: AIModel };
 
@@ -109,6 +110,10 @@ export default async (
 					value: { vendor: "openai", model: "high" },
 				},
 				{
+					label: "Gemini 1.5 Pro 002",
+					value: { vendor: "gemini", model: "high" },
+				},
+				{
 					label: "o1-preview",
 					value: { vendor: "openai", model: "middle" },
 				},
@@ -144,6 +149,8 @@ export default async (
 				? useAnthropic
 				: aiModel.vendor === "openai"
 				? useOpenAI
+				: aiModel.vendor === "gemini"
+				? useGemini
 				: useLocal;
 
 		let hint: string | undefined = undefined;
