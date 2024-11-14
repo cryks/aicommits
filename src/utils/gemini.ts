@@ -56,7 +56,7 @@ export async function generateCommitMessage(
 		model: openaiModel,
 		messages,
     //max_tokens: 1000,
-    temperature: 1,
+    temperature: 0.8,
 		/*
     response_format: {
       type: "json_object",

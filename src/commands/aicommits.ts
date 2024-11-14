@@ -106,12 +106,12 @@ export default async (
 					value: { vendor: "anthropic", model: "high" },
 				},
 				{
-					label: "GPT-4o",
-					value: { vendor: "openai", model: "high" },
-				},
-				{
 					label: "Gemini 1.5 Pro 002",
 					value: { vendor: "gemini", model: "high" },
+				},
+				{
+					label: "GPT-4o",
+					value: { vendor: "openai", model: "high" },
 				},
 				{
 					label: "o1-preview",

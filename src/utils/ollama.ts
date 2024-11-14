@@ -46,13 +46,16 @@ export async function generateCommitMessage(
 		content: leading,
 	});
 
-	const resp = await fetch("http://localhost:11434/api/chat", {
+	const resp = await fetch("http://localhost:1234/v1/chat/completions", {
 		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
 		body: JSON.stringify({
-			model: model === "high" ? "llama3:70b" : "llama3",
+			model: model === "high" ? "qwen2.5-coder-32b" : "llama3",
 			stream: false,
 			options: {
-				temperature: 0,
+				temperature: 0.8,
 			},
 			messages,
 		}),
