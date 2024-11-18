@@ -2,7 +2,6 @@ import type {
 	AssistantResponse,
 	CommitParams,
 	GeneratedCommitMessages,
-	Model,
 } from "./assistant.js";
 import { generatePromptJSON } from "./prompt.js";
 
@@ -12,7 +11,7 @@ type Message = {
 };
 
 export async function generateCommitMessage(
-	model: Model,
+	model: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
 	const messages: Message[] = [];
@@ -52,7 +51,7 @@ export async function generateCommitMessage(
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-			model: model === "high" ? "qwen2.5-coder-32b" : "llama3",
+			model,
 			stream: false,
 			options: {
 				temperature: 0.8,

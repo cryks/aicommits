@@ -1,7 +1,5 @@
 import type { Chat } from "./chat.js";
 
-export type Model = "high" | "middle" | "low";
-
 export type CommitParams = {
 	maxLength: number;
 	diff: string;

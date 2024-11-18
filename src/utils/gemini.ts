@@ -3,7 +3,6 @@ import type {
 	AssistantResponse,
 	CommitParams,
 	GeneratedCommitMessages,
-	Model,
 } from "./assistant.js";
 import { generatePromptJSON } from "./prompt.js";
 
@@ -13,10 +12,9 @@ const openai = new OpenAI({
 });
 
 export async function generateCommitMessage(
-	model: Model,
+	model: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
-	const openaiModel = model === "high" ? "gemini-1.5-pro-002" : model === "middle" ? "gemini-1.5-flash-002" : "gemini-1.5-flash-8b";
 	const systemRole = "system";
 
 	const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
@@ -53,7 +51,7 @@ export async function generateCommitMessage(
 	}
 
 	const msg = await openai.chat.completions.create({
-		model: openaiModel,
+		model,
 		messages,
     //max_tokens: 1000,
     temperature: 0.8,

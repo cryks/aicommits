@@ -3,7 +3,6 @@ import type {
 	AssistantResponse,
 	CommitParams,
 	GeneratedCommitMessages,
-	Model,
 } from "./assistant.js";
 import { generatePromptJSON } from "./prompt.js";
 
@@ -12,7 +11,7 @@ const anthropic = new Anthropic({
 });
 
 export async function generateCommitMessage(
-	model: Model,
+	model: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
 	const messages: Anthropic.Messages.MessageParam[] = [];
@@ -42,12 +41,7 @@ export async function generateCommitMessage(
 	});
 
 	const msg = await anthropic.messages.create({
-		model:
-			model === "high"
-				? "claude-3-5-sonnet-20241022"
-				: model === "middle"
-				? "claude-3-opus-20240229"
-				: "claude-3-5-haiku-20241022",
+		model,
 		max_tokens: 1000,
 		temperature: 0,
 		system: prompt.systemPrompt,

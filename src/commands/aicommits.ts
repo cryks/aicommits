@@ -12,7 +12,7 @@ import { execa } from "execa";
 import { bgCyan, black, cyan, dim, green, red } from "kolorist";
 import fs from "node:fs";
 import path from "node:path";
-import type { AssistantResponse, Model } from "../utils/assistant.js";
+import type { AssistantResponse } from "../utils/assistant.js";
 import { Chat } from "../utils/chat.js";
 import { generateCommitMessage as useAnthropic } from "../utils/claude.js";
 import { getConfig } from "../utils/config.js";
@@ -30,8 +30,7 @@ import { generateCommitMessage as useLocal } from "../utils/ollama.js";
 import { generateCommitMessage as useOpenAI } from "../utils/openai.js";
 
 type AIVendor = "anthropic" | "openai" | "gemini" | "local";
-type AIModel = Model;
-type AIModelVendor = { vendor: AIVendor } & { model: AIModel };
+type AIModelVendor = { vendor: AIVendor } & { model: string };
 
 async function inferProjectType() {
 	const gitDir = await getGitTopDir();
@@ -103,39 +102,27 @@ export default async (
 			options: [
 				{
 					label: "Claude 3.5 Sonnet",
-					value: { vendor: "anthropic", model: "high" },
+					value: { vendor: "anthropic", model: "claude-3-5-sonnet-20241022" },
 				},
 				{
 					label: "Gemini 1.5 Pro 002",
-					value: { vendor: "gemini", model: "high" },
+					value: { vendor: "gemini", model: "gemini-1.5-pro-002" },
+				},
+				{
+					label: "Gemini Experimental 1114",
+					value: { vendor: "gemini", model: "gemini-exp-1114" },
 				},
 				{
 					label: "GPT-4o",
-					value: { vendor: "openai", model: "high" },
+					value: { vendor: "openai", model: "gpt-4o" },
 				},
 				{
 					label: "o1-preview",
-					value: { vendor: "openai", model: "middle" },
+					value: { vendor: "openai", model: "o1-preview" },
 				},
 				{
 					label: "o1-mini",
-					value: { vendor: "openai", model: "low" },
-				},
-				{
-					label: "llama3:70b",
-					value: { vendor: "local", model: "high" },
-				},
-				{
-					label: "llama3:8b",
-					value: { vendor: "local", model: "middle" },
-				},
-				{
-					label: "Claude 3 Opus",
-					value: { vendor: "anthropic", model: "middle" },
-				},
-				{
-					label: "Claude 3.5 Haiku",
-					value: { vendor: "anthropic", model: "low" },
+					value: { vendor: "openai", model: "o1-mini" },
 				},
 			],
 		});
