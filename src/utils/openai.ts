@@ -54,7 +54,7 @@ export async function generateCommitMessage(
 		...(model !== "gpt-4o" ? {
 		} : {
 			max_tokens: 1000,
-			temperature: 1,
+			temperature: 0,
 			response_format: {
 				type: "json_object",
 			},
