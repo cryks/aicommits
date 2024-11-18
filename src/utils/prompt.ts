@@ -52,9 +52,9 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   - Generate commit message candidates that range from highly relevant to creative, based on the diff and hint
   - For each candidate, include a "score" field indicating the estimated relevance (0-100, where 100 is most relevant)
   - Sort the candidates by descending score
-  - If the AI assistant has truly important information that the user might not be aware of, include it in an "assistant" field at the top level of the JSON output
-  - The "assistant" field should not explain the commit content, as the user is already aware of it
-  - The "assistant" field should be concise, containing at most 72 characters for alphanumeric content or 36 characters for Japanese content
+  - If there are additional questions you want to ask the user to generate the commit messages, include them in the "assistant" field at the top level of the JSON output
+  - If the intent cannot be inferred from the diff and generating commit message candidates is difficult, use the "assistant" field to ask the user for additional context or clarification
+  - Keep the "assistant" field concise, containing at most 72 characters for alphanumeric content or 36 characters for Japanese content
   - Ensure the "assistant" field, if present, is a valid JSON string, with newlines escaped as \\n, and is written in Japanese
   - Output valid JSON as shown in these examples:
 
@@ -76,7 +76,7 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
         "score": 95
       }
     ],
-    "assistant": "ユーザーが気づいていない可能性のある重要な情報"
+    "assistant": "Brief questions the assistant wants to ask the user"
   }
   </output>
 
