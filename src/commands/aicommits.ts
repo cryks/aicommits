@@ -96,35 +96,37 @@ export default async (
 			generate: generate?.toString(),
 		});
 
+		const modelOptions: { label: string; value: AIModelVendor }[] = [
+			{
+				label: "Claude 3.5 Sonnet",
+				value: { vendor: "anthropic", model: "claude-3-5-sonnet-20241022" },
+			},
+			{
+				label: "Gemini 1.5 Pro 002",
+				value: { vendor: "gemini", model: "gemini-1.5-pro-002" },
+			},
+			{
+				label: "Gemini Experimental 1114",
+				value: { vendor: "gemini", model: "gemini-exp-1114" },
+			},
+			{
+				label: "GPT-4o",
+				value: { vendor: "openai", model: "gpt-4o" },
+			},
+			{
+				label: "o1-preview",
+				value: { vendor: "openai", model: "o1-preview" },
+			},
+			{
+				label: "o1-mini",
+				value: { vendor: "openai", model: "o1-mini" },
+			},
+		];
+
 		const aiModel = await select({
 			message: "Choose an AI model to use:",
-			initialValue: { vendor: "anthropic", model: "high" } as AIModelVendor,
-			options: [
-				{
-					label: "Claude 3.5 Sonnet",
-					value: { vendor: "anthropic", model: "claude-3-5-sonnet-20241022" },
-				},
-				{
-					label: "Gemini 1.5 Pro 002",
-					value: { vendor: "gemini", model: "gemini-1.5-pro-002" },
-				},
-				{
-					label: "Gemini Experimental 1114",
-					value: { vendor: "gemini", model: "gemini-exp-1114" },
-				},
-				{
-					label: "GPT-4o",
-					value: { vendor: "openai", model: "gpt-4o" },
-				},
-				{
-					label: "o1-preview",
-					value: { vendor: "openai", model: "o1-preview" },
-				},
-				{
-					label: "o1-mini",
-					value: { vendor: "openai", model: "o1-mini" },
-				},
-			],
+			initialValue: modelOptions[0].value,
+			options: modelOptions,
 		});
 		if (isCancel(aiModel)) {
 			outro("Commit aborted");
