@@ -89,27 +89,23 @@ export function generatePromptJSON(diff: string, config: PromptConfig) {
   ${additionalPrompt ? `
   If there are any contradictions between the <additional_prompt> and the base prompt, prioritize the <additional_prompt>.
   ` : ''}
+
+  ${config.gitLog ? `
+  If there are any contradictions between the <git_log_analysis> and the system prompt, prioritize the instructions in the <git_log_analysis>.
+  ` : ''}
   `;
 
   const gitLog = config.gitLog ?
 `
-Please use the provided \`git log\` information as context to generate commit message candidates that align with the project's history. Pay particular attention to the following cases for consistency with past commits:
+<git_log_analysis>
+First, analyze the commit messages according to the following rules:
+1. Analyze the latest 50 commit messages and calculate the percentage of commits with scopes
+2. If the percentage of commits with scopes is less than 25%, completely exclude scopes from new commit messages
+3. If the percentage is between 25-75%, include scopes only when necessary
+4. If the percentage is above 75%, generally include scopes
 
-1. When similar changes have been made in the past.
-2. When common themes or scopes are evident from the \`git log\`.
-
-Refer to past commit messages to ensure coherence in style and tone, prioritizing any recurring terms or conventions found in the \`git log\` section. However, the latest context in the unified diff should take precedence over previous messages unless directly relevant.
-
-The \`git log\` information is ordered in descending order (most recent commits at the top) and formatted as follows:
-
-\`\`\`plaintext
-<git_log>
-\`git log --stat\` results here
-...
-</git_log>
-\`\`\`
-
-Additionally, if scopes are not defined in recent commits, exclude scopes from the generated commit messages as well.
+Also analyze the main scope patterns used in past commits and maintain consistency with commonly used scopes.
+</git_log_analysis>
 
 <git_log>
 ${config.gitLog}
