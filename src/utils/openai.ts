@@ -14,7 +14,7 @@ export async function generateCommitMessage(
 	model: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
-	const systemRole = model !== "gpt-4o" ? "user" : "system";
+	const systemRole = 'developer';
 
 	const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 	const leading = "{";
@@ -50,15 +50,9 @@ export async function generateCommitMessage(
 	const msg = await openai.chat.completions.create({
 		model,
 		messages,
-		//n: commit.n,
-		...(model !== "gpt-4o" ? {
-		} : {
-			max_tokens: 1000,
-			temperature: 0,
-			response_format: {
-				type: "json_object",
-			},
-		}),
+		response_format: {
+			type: "json_object",
+		},
 	});
 
 	const contents = msg.choices
