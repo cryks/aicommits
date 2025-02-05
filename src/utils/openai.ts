@@ -50,6 +50,7 @@ export async function generateCommitMessage(
 	const msg = await openai.chat.completions.create({
 		model,
 		messages,
+		reasoning_effort: "high",
 		response_format: {
 			type: "json_object",
 		},
