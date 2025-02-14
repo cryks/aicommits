@@ -11,9 +11,11 @@ const openai = new OpenAI({
 });
 
 export async function generateCommitMessage(
-	model: string,
+	rawModel: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
+	const [model, effort] = rawModel.split(":");
+
 	const systemRole = 'developer';
 
 	const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
@@ -50,7 +52,7 @@ export async function generateCommitMessage(
 	const msg = await openai.chat.completions.create({
 		model,
 		messages,
-		reasoning_effort: "high",
+		reasoning_effort: effort as 'medium' | 'high',
 		response_format: {
 			type: "json_object",
 		},

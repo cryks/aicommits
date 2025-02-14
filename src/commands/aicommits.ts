@@ -99,7 +99,11 @@ export default async (
 		const modelOptions: { label: string; value: AIModelVendor }[] = [
 			{
 				label: "o3-mini",
-				value: { vendor: "openai", model: "o3-mini" },
+				value: { vendor: "openai", model: "o3-mini:medium" },
+			},
+			{
+				label: "o3-mini-high",
+				value: { vendor: "openai", model: "o3-mini:high" },
 			},
 			{
 				label: "Claude 3.5 Sonnet",
@@ -116,10 +120,6 @@ export default async (
 			{
 				label: "Gemini Experimental 1121",
 				value: { vendor: "gemini", model: "gemini-exp-1121" },
-			},
-			{
-				label: "o1-mini",
-				value: { vendor: "openai", model: "o1-mini" },
 			},
 		];
 
