@@ -106,6 +106,10 @@ export default async (
 				value: { vendor: "openai", model: "o3-mini:high" },
 			},
 			{
+				label: "GPT-4o",
+				value: { vendor: "openai", model: "gpt-4o" },
+			},
+			{
 				label: "Claude 3.5 Sonnet",
 				value: { vendor: "anthropic", model: "claude-3-5-sonnet-latest" },
 			},
