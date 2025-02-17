@@ -106,6 +106,10 @@ export default async (
 				value: { vendor: "openai", model: "o3-mini:high" },
 			},
 			{
+				label: "o3-mini-low",
+				value: { vendor: "openai", model: "o3-mini:low" },
+			},
+			{
 				label: "GPT-4o",
 				value: { vendor: "openai", model: "gpt-4o" },
 			},
