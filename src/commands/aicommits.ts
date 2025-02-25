@@ -98,6 +98,10 @@ export default async (
 
 		const modelOptions: { label: string; value: AIModelVendor }[] = [
 			{
+				label: "Claude 3.7 Sonnet",
+				value: { vendor: "anthropic", model: "claude-3-7-sonnet-latest" },
+			},
+			{
 				label: "o3-mini",
 				value: { vendor: "openai", model: "o3-mini:medium" },
 			},
@@ -112,14 +116,6 @@ export default async (
 			{
 				label: "GPT-4o",
 				value: { vendor: "openai", model: "gpt-4o" },
-			},
-			{
-				label: "Claude 3.5 Sonnet",
-				value: { vendor: "anthropic", model: "claude-3-5-sonnet-latest" },
-			},
-			{
-				label: "Claude 3.5 Haiku",
-				value: { vendor: "anthropic", model: "claude-3-5-haiku-latest" },
 			},
 			{
 				label: "Gemini 1.5 Pro 002",
