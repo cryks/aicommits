@@ -1,16 +1,16 @@
 type PromptConfig = {
-	maxLength: number;
-	hint?: string;
+  maxLength: number;
+  hint?: string;
   gitLog?: string;
-	n: number;
-	additionalPrompt?: string;
-	isNuxtProject?: boolean;
-	isGoProject?: boolean;
+  n: number;
+  additionalPrompt?: string;
+  isNuxtProject?: boolean;
+  isGoProject?: boolean;
 };
 
 // prettier-ignore
 export function generatePromptJSON(diff: string, config: PromptConfig) {
-  const { maxLength, hint, gitLog, n, additionalPrompt, isNuxtProject, isGoProject } = config;
+  const { maxLength, hint, gitLog, n, additionalPrompt } = config;
 
   const systemPrompt = `
 Please generate ${n} concise git commit message candidates based on the provided diff, following these rules:
@@ -33,17 +33,6 @@ Content:
 - Refer to past commit messages (gitLog) as a style and scope reference.
 - If an additional prompt is provided, prioritize its instructions over the base rules.
 - Focus on clarity, brevity, and precision.
-
-${isNuxtProject ? `
-Nuxt Project Considerations:
-- For Nuxt projects, use scopes such as \`nuxt\`, \`config\`, \`plugin\`, \`module\`, \`pages\`, \`components\`, \`composables\`, \`server\`, \`store\`, \`assets\`, \`layouts\`, \`middleware\`, or \`public\`.
-` : ''}
-
-${isGoProject ? `
-Go Project Considerations:
-- For Go projects, adhere to Go community commit message conventions.
-- Highlight module or package changes when applicable.
-` : ''}
 
 Output:
 - Return valid JSON with a "commits" array. Each element should have a "message" and a "score" (0-100, where 100 is most relevant).

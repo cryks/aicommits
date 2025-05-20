@@ -48,7 +48,7 @@ export async function generateCommitMessage(
 		messages,
 	});
 
-	const contents = msg.content.map((x) => x.text);
+	const contents = msg.content.map((x) => x.type === "text" && x.text).filter(x => typeof x === "string");
 	const content = leading + contents[0].trim() + (msg.stop_sequence ?? "");
 	try {
 		const generated = JSON.parse(content) as GeneratedCommitMessages;
