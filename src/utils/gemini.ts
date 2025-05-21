@@ -1,4 +1,4 @@
-import { Content, GoogleGenerativeAI } from "@google/generative-ai";
+import { Content, GoogleGenAI } from "@google/genai";
 import type {
 	AssistantResponse,
 	CommitParams,
@@ -6,21 +6,13 @@ import type {
 } from "./assistant.js";
 import { generatePromptJSON } from "./prompt.js";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export async function generateCommitMessage(
 	model: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
 	const prompt = generatePromptJSON(commit.diff, commit);
-
-	const geminiModel = genAI.getGenerativeModel({
-		model,
-		generationConfig: {
-			temperature: 0,
-			responseMimeType: "application/json",
-		}
-	});
 
 	const history: Content[] = [];
 
@@ -31,14 +23,19 @@ export async function generateCommitMessage(
 		history.push({ role: "user", parts: [{ text: chat.prompt }] });
 	}
 
-	const chat = geminiModel.startChat({
-		history,
+	const result = await genAI.models.generateContent({
+		model,
+		config: {
+			temperature: 0,
+			responseMimeType: "application/json",
+		},
+		contents: history,
 	});
 
-	const result = await chat.sendMessage("");
-	const text = result.response.text();
-
-	const jsonText = text;
+	const jsonText = result.text;
+	if (!jsonText) {
+		throw new Error("No response from Gemini");
+	}
 
 	try {
 		const generated = JSON.parse(jsonText) as GeneratedCommitMessages;
