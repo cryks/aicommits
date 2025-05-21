@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { Content, GoogleGenerativeAI } from "@google/generative-ai";
 import type {
 	AssistantResponse,
 	CommitParams,
@@ -6,78 +6,49 @@ import type {
 } from "./assistant.js";
 import { generatePromptJSON } from "./prompt.js";
 
-const openai = new OpenAI({
-	apiKey: process.env.GEMINI_API_KEY,
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function generateCommitMessage(
 	model: string,
 	commit: CommitParams
 ): Promise<AssistantResponse> {
-	const systemRole = "system";
-
-	const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
-	const leading = "{";
-
 	const prompt = generatePromptJSON(commit.diff, commit);
 
-	messages.push({
-		role: systemRole,
-		content: prompt.systemPrompt,
+	const geminiModel = genAI.getGenerativeModel({
+		model,
+		generationConfig: {
+			temperature: 0,
+			responseMimeType: "application/json",
+		}
 	});
 
-	messages.push({
-		role: "user",
-		content: prompt.userPrompt,
-	});
+	const history: Content[] = [];
+
+	history.push({ role: "user", parts: [{ text: prompt.systemPrompt + "\n\n" + prompt.userPrompt }] });
 
 	for (const chat of commit.chats) {
-		messages.push({
-			role: "assistant",
-			content: chat.assistant,
-		});
-		messages.push({
-			role: "user",
-			content: chat.prompt,
-		});
+		history.push({ role: "model", parts: [{ text: chat.assistant }] });
+		history.push({ role: "user", parts: [{ text: chat.prompt }] });
 	}
 
-	if (leading) {
-		messages.push({
-			role: "assistant",
-			content: leading,
-		});
-	}
-
-	const msg = await openai.chat.completions.create({
-		model,
-		messages,
-    //max_tokens: 1000,
-    temperature: 0,
-		/*
-    response_format: {
-      type: "json_object",
-    },
-		*/
+	const chat = geminiModel.startChat({
+		history,
 	});
 
-	const contents = msg.choices
-		.map((x) => x.message.content)
-		.filter((x): x is string => !!x)
-		.map((x) => leading + x);
+	const result = await chat.sendMessage("");
+	const text = result.response.text();
+
+	const jsonText = text;
 
 	try {
-		const generated = contents.map(
-			(x) => JSON.parse(x) as GeneratedCommitMessages
-		);
+		const generated = JSON.parse(jsonText) as GeneratedCommitMessages;
 		return {
-			rawResponse: contents[0],
-			messages: generated.flatMap((x) => x.commits),
-			assistant: generated[0].assistant,
+			rawResponse: jsonText,
+			messages: generated.commits,
+			assistant: generated.assistant,
 		};
 	} catch (ex) {
-		console.dir(contents, { depth: null });
+		console.dir(jsonText, { depth: null });
 		throw ex;
 	}
 }

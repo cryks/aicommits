@@ -106,8 +106,16 @@ export default async (
 				value: { vendor: "anthropic", model: "claude-3-7-sonnet-latest" },
 			},
 			{
+				label: "Gemini 2.5 Flash",
+				value: { vendor: "gemini", model: "gemini-2.5-flash-preview-05-20" },
+			},
+			{
 				label: "GPT-4.1",
 				value: { vendor: "openai", model: "gpt-4.1" },
+			},
+			{
+				label: "Gemini 2.5 Pro",
+				value: { vendor: "gemini", model: "gemini-2.5-pro-preview-05-06" },
 			},
 			{
 				label: "o3-mini",
@@ -120,14 +128,6 @@ export default async (
 			{
 				label: "Claude 3.5 Sonnet (20240620)",
 				value: { vendor: "anthropic", model: "claude-3-5-sonnet-20240620" },
-			},
-			{
-				label: "Gemini 1.5 Pro 002",
-				value: { vendor: "gemini", model: "gemini-1.5-pro-002" },
-			},
-			{
-				label: "Gemini Experimental 1121",
-				value: { vendor: "gemini", model: "gemini-exp-1121" },
 			},
 		];
 

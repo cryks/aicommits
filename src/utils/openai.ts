@@ -52,6 +52,7 @@ export async function generateCommitMessage(
 	const msg = await openai.chat.completions.create({
 		model,
 		messages,
+		temperature: 0,
 		reasoning_effort: effort as 'medium' | 'high',
 		response_format: {
 			type: "json_object",
