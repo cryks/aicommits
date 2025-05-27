@@ -98,20 +98,28 @@ export default async (
 
 		const modelOptions: { label: string; value: AIModelVendor }[] = [
 			{
+				label: "GPT-4.1",
+				value: { vendor: "openai", model: "gpt-4.1" },
+			},
+			{
+				label: "Claude Sonnet 4",
+				value: { vendor: "anthropic", model: "claude-sonnet-4-20250514" },
+			},
+			{
+				label: "Claude Opus 4",
+				value: { vendor: "anthropic", model: "claude-opus-4-20250514" },
+			},
+			{
+				label: "Claude Sonnet 3.7",
+				value: { vendor: "anthropic", model: "claude-3-7-sonnet-latest" },
+			},
+			{
 				label: "GPT-4.1-mini",
 				value: { vendor: "openai", model: "gpt-4.1-mini" },
 			},
 			{
-				label: "Claude 3.7 Sonnet",
-				value: { vendor: "anthropic", model: "claude-3-7-sonnet-latest" },
-			},
-			{
 				label: "Gemini 2.5 Flash",
 				value: { vendor: "gemini", model: "gemini-2.5-flash-preview-05-20" },
-			},
-			{
-				label: "GPT-4.1",
-				value: { vendor: "openai", model: "gpt-4.1" },
 			},
 			{
 				label: "Gemini 2.5 Pro",
